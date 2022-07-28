@@ -15,6 +15,6 @@ describe('CORS', () => {
         expect(res.headers.get('Access-Control-Allow-Methods')).toBe('*')
         expect(res.headers.get('Access-Control-Allow-Headers')).toBe('*')
         expect(res.headers.get('Access-Control-Exposed-Headers')).toBe('*')
-        expect(res.headers.get('Access-Control-Allow-Credentials')).toBe('true')
+        expect(res.headers.get('Access-Control-Allow-Credentials')).toBe(null)
     })
 })
