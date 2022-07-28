@@ -1,6 +1,6 @@
 {
   "name": "@kingworldjs/cors",
-  "version": "0.0.0-experimental.0",
+  "version": "0.0.0-experimental.1",
   "description": "A plugin for kingworld that for Cross Origin Requests (CORs)",
   "author": {
     "name": "saltyAom",

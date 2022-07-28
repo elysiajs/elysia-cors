@@ -117,7 +117,7 @@ interface CORSConfig {
      */
     exposedHeaders?: string | string[]
     /**
-     * @default `true`
+     * @default `false`
      *
      * Assign **Access-Control-Allow-Credentials** header.
      *
@@ -153,7 +153,7 @@ const cors: Plugin<CORSConfig> = (
         methods = '*',
         allowedHeaders = '*',
         exposedHeaders = '*',
-        credentials = true,
+        credentials = false,
         maxAge = 5,
         preflight = true
     } = {
@@ -161,7 +161,7 @@ const cors: Plugin<CORSConfig> = (
         methods: '*',
         allowedHeaders: '*',
         exposedHeaders: '*',
-        credentials: true,
+        credentials: false,
         maxAge: 5,
         preflight: true
     }
