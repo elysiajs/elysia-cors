@@ -1,4 +1,7 @@
-import type { Plugin, Context, Handler } from 'kingworld'
+import type KingWorld from 'kingworld'
+import type { Handler } from 'kingworld'
+import type Context from 'kingworld/src/context'
+
 import { isAbsolute } from 'path'
 
 type Origin = string | RegExp | ((context: Context) => boolean | void)
@@ -146,8 +149,8 @@ interface CORSConfig {
     preflight?: boolean
 }
 
-const cors: Plugin<CORSConfig> = (
-    app,
+const cors = (
+    app: KingWorld,
     {
         origin = true,
         methods = '*',
@@ -156,7 +159,7 @@ const cors: Plugin<CORSConfig> = (
         credentials = false,
         maxAge = 5,
         preflight = true
-    } = {
+    }: CORSConfig = {
         origin: true,
         methods: '*',
         allowedHeaders: '*',
@@ -195,11 +198,8 @@ const cors: Plugin<CORSConfig> = (
 
         if (!_origin)
             if (origin) {
-                context.responseHeaders.append('Vary', '*')
-                return void responseHeaders.append(
-                    'Access-Control-Allow-Origin',
-                    '*'
-                )
+                context.responseHeaders['Vary'] = '*'
+                return (responseHeaders['Access-Control-Allow-Origin'] = '*')
             } else return
 
         if (!_origin[0]) return
@@ -210,22 +210,17 @@ const cors: Plugin<CORSConfig> = (
             const origin = context.request.headers.get('Origin')
             const value = processOrigin(header, context, origin ?? '')
             if (value === true) {
-                context.responseHeaders.append('Vary', origin ? 'Origin' : '*')
+                context.responseHeaders['Vary'] = origin ? 'Origin' : '*'
 
-                return void responseHeaders.append(
-                    'Access-Control-Allow-Origin',
-                    context.request.headers.get('Origin') ?? '*'
-                )
+                return (responseHeaders['Access-Control-Allow-Origin'] =
+                    context.request.headers.get('Origin') ?? '*')
             }
 
             if (value) headers.push(value)
         }
 
-        context.responseHeaders.append('Vary', 'Origin')
-        responseHeaders.append(
-            'Access-Control-Allow-Origin',
-            headers.join(', ')
-        )
+        context.responseHeaders['Vary'] = 'Origin'
+        responseHeaders['Access-Control-Allow-Origin'] = headers.join(', ')
     }
 
     const handleMethod = (context: Context) => {
@@ -234,41 +229,28 @@ const cors: Plugin<CORSConfig> = (
         const { responseHeaders } = context
 
         if (methods === '*')
-            return void responseHeaders.append(
-                'Access-Control-Allow-Methods',
-                '*'
-            )
+            return (responseHeaders['Access-Control-Allow-Methods'] = '*')
 
         if (!Array.isArray(methods))
-            return void responseHeaders.append(
-                'Access-Control-Allow-Methods',
-                methods
-            )
+            return (responseHeaders['Access-Control-Allow-Methods'] = methods)
 
-        responseHeaders.append(
-            'Access-Control-Allow-Methods',
-            methods.join(', ')
-        )
+        responseHeaders['Access-Control-Allow-Methods'] = methods.join(', ')
     }
 
     if (preflight)
-        app.options('*', (context) => {
+        app.options('/*', (context) => {
             handleOrigin(context)
             handleMethod(context)
 
             if (exposedHeaders[0])
-                context.responseHeaders.append(
-                    'Access-Control-Allow-Headers',
+                context.responseHeaders['Access-Control-Allow-Headers'] =
                     typeof allowedHeaders === 'string'
                         ? allowedHeaders
                         : allowedHeaders.join(', ')
-                )
 
             if (maxAge)
-                context.responseHeaders.append(
-                    'Access-Control-Max-Age',
+                context.responseHeaders['Access-Control-Max-Age'] =
                     maxAge.toString()
-                )
 
             return new Response('', {
                 status: 204
@@ -282,23 +264,19 @@ const cors: Plugin<CORSConfig> = (
         const { responseHeaders } = context
 
         if (allowedHeaders[0])
-            responseHeaders.append(
-                'Access-Control-Allow-Headers',
+            responseHeaders['Access-Control-Allow-Headers'] =
                 typeof allowedHeaders === 'string'
                     ? allowedHeaders
                     : allowedHeaders.join(', ')
-            )
 
         if (exposedHeaders[0])
-            responseHeaders.append(
-                'Access-Control-Exposed-Headers',
+            responseHeaders['Access-Control-Exposed-Headers'] =
                 typeof exposedHeaders === 'string'
                     ? exposedHeaders
                     : exposedHeaders.join(', ')
-            )
 
         if (credentials)
-            responseHeaders.append('Access-Control-Allow-Credentials', 'true')
+            responseHeaders['Access-Control-Allow-Credentials'] = 'true'
     })
 
     return app
