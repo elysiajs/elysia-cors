@@ -1,4 +1,4 @@
-import type KingWorld from 'kingworld'
+import type { KingWorld } from 'kingworld'
 import type { Handler } from 'kingworld'
 import type Context from 'kingworld/src/context'
 
@@ -149,7 +149,7 @@ interface CORSConfig {
     preflight?: boolean
 }
 
-const cors = (
+export const cors = (
     app: KingWorld,
     {
         origin = true,
@@ -194,15 +194,15 @@ const cors = (
     }
 
     const handleOrigin = (context: Context) => {
-        const { responseHeaders } = context
-
         if (!_origin)
             if (origin) {
-                context.responseHeaders['Vary'] = '*'
-                return (responseHeaders['Access-Control-Allow-Origin'] = '*')
+                context.set.headers['Vary'] = '*'
+                context.set.headers['Access-Control-Allow-Origin'] = '*'
+
+                return
             } else return
 
-        if (!_origin[0]) return
+        if (!_origin.length) return
 
         const headers: string[] = []
 
@@ -210,46 +210,47 @@ const cors = (
             const origin = context.request.headers.get('Origin')
             const value = processOrigin(header, context, origin ?? '')
             if (value === true) {
-                context.responseHeaders['Vary'] = origin ? 'Origin' : '*'
+                context.set.headers['Vary'] = origin ? 'Origin' : '*'
+                context.set.headers['Access-Control-Allow-Origin'] =
+                    context.request.headers.get('Origin') ?? '*'
 
-                return (responseHeaders['Access-Control-Allow-Origin'] =
-                    context.request.headers.get('Origin') ?? '*')
+                return
             }
 
             if (value) headers.push(value)
         }
 
-        context.responseHeaders['Vary'] = 'Origin'
-        responseHeaders['Access-Control-Allow-Origin'] = headers.join(', ')
+        context.set.headers['Vary'] = 'Origin'
+        context.set.headers['Access-Control-Allow-Origin'] = headers.join(', ')
     }
 
     const handleMethod = (context: Context) => {
         if (!methods || !methods[0]) return
 
-        const { responseHeaders } = context
+        const headers = context.set.headers
 
         if (methods === '*')
-            return (responseHeaders['Access-Control-Allow-Methods'] = '*')
+            return (headers['Access-Control-Allow-Methods'] = '*')
 
         if (!Array.isArray(methods))
-            return (responseHeaders['Access-Control-Allow-Methods'] = methods)
+            return (headers['Access-Control-Allow-Methods'] = methods)
 
-        responseHeaders['Access-Control-Allow-Methods'] = methods.join(', ')
+        headers['Access-Control-Allow-Methods'] = methods.join(', ')
     }
 
     if (preflight)
-        app.options('/*', (context) => {
+        app.options('*', (context) => {
             handleOrigin(context)
             handleMethod(context)
 
-            if (exposedHeaders[0])
-                context.responseHeaders['Access-Control-Allow-Headers'] =
+            if (exposedHeaders.length)
+                context.set.headers['Access-Control-Allow-Headers'] =
                     typeof allowedHeaders === 'string'
                         ? allowedHeaders
                         : allowedHeaders.join(', ')
 
             if (maxAge)
-                context.responseHeaders['Access-Control-Max-Age'] =
+                context.set.headers['Access-Control-Max-Age'] =
                     maxAge.toString()
 
             return new Response('', {
@@ -257,26 +258,25 @@ const cors = (
             })
         })
 
-    app.transform((context) => {
+    app.onTransform((context) => {
         handleOrigin(context)
         handleMethod(context)
 
-        const { responseHeaders } = context
+        const headers = context.set.headers
 
-        if (allowedHeaders[0])
-            responseHeaders['Access-Control-Allow-Headers'] =
+        if (allowedHeaders.length)
+            headers['Access-Control-Allow-Headers'] =
                 typeof allowedHeaders === 'string'
                     ? allowedHeaders
                     : allowedHeaders.join(', ')
 
-        if (exposedHeaders[0])
-            responseHeaders['Access-Control-Exposed-Headers'] =
+        if (exposedHeaders.length)
+            headers['Access-Control-Exposed-Headers'] =
                 typeof exposedHeaders === 'string'
                     ? exposedHeaders
                     : exposedHeaders.join(', ')
 
-        if (credentials)
-            responseHeaders['Access-Control-Allow-Credentials'] = 'true'
+        if (credentials) headers['Access-Control-Allow-Credentials'] = 'true'
     })
 
     return app

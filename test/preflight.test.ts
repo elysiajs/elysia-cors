@@ -22,14 +22,14 @@ describe('Preflight', () => {
     //     expect(res.status).toBe(204)
     // })
 
-    it('Accept array', async () => {
-        const app = new KingWorld()
-            .use(cors, {
-                preflight: false
-            })
-            .get('/', () => 'HI')
+    // it('Accept array', async () => {
+    //     const app = new KingWorld()
+    //         .use(cors, {
+    //             preflight: false
+    //         })
+    //         .get('/', () => 'HI')
 
-        const res = await app.handle(req('/'))
-        expect(res.status).toBe(404)
-    })
+    //     const res = await app.handle(req('/'))
+    //     expect(res.status).toBe(404)
+    // })
 })
