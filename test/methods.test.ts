@@ -12,9 +12,11 @@ const req = (path: string, headers?: Record<string, string>) =>
 describe('Methods', () => {
     it('Accept single methods', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                methods: 'GET'
-            })
+            .use(
+                cors({
+                    methods: 'GET'
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
@@ -23,9 +25,11 @@ describe('Methods', () => {
 
     it('Accept array', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                methods: ['GET', 'POST']
-            })
+            .use(
+                cors({
+                    methods: ['GET', 'POST']
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))

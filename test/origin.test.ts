@@ -12,9 +12,11 @@ const req = (path: string, headers?: Record<string, string>) =>
 describe('Origin', () => {
     it('Accept string', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                origin: 'https://api.hifumin.app'
-            })
+            .use(
+                cors({
+                    origin: 'https://api.hifumin.app'
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
@@ -25,9 +27,11 @@ describe('Origin', () => {
 
     it('Accept boolean', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                origin: 'https://example.com'
-            })
+            .use(
+                cors({
+                    origin: 'https://example.com'
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
@@ -38,9 +42,11 @@ describe('Origin', () => {
 
     it('Accept RegExp', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                origin: /\.com/g
-            })
+            .use(
+                cors({
+                    origin: /\.com/g
+                })
+            )
             .get('/', () => 'HI')
 
         const notAllowed = await app.handle(
@@ -61,9 +67,11 @@ describe('Origin', () => {
 
     it('Accept Function', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                origin: () => true
-            })
+            .use(
+                cors({
+                    origin: () => true
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(
@@ -78,9 +86,11 @@ describe('Origin', () => {
 
     it('Accept string[]', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                origin: ['https://example.com', 'https://demo.app']
-            })
+            .use(
+                cors({
+                    origin: ['https://example.com', 'https://demo.app']
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(
@@ -95,13 +105,11 @@ describe('Origin', () => {
 
     it('accepts Function[]', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                origin: [
-                    'https://demo.app',
-                    () => false,
-                    /.com/g
-                ]
-            })
+            .use(
+                cors({
+                    origin: ['https://demo.app', () => false, /.com/g]
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(

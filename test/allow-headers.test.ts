@@ -12,20 +12,26 @@ const req = (path: string, headers?: Record<string, string>) =>
 describe('Allowed Headers', () => {
     it('Accept single header', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                allowedHeaders: 'Content-Type'
-            })
+            .use(
+                cors({
+                    allowedHeaders: 'Content-Type'
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
-        expect(res.headers.get('Access-Control-Allow-Headers')).toBe('Content-Type')
+        expect(res.headers.get('Access-Control-Allow-Headers')).toBe(
+            'Content-Type'
+        )
     })
 
     it('Accept array', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                allowedHeaders: ['Content-Type', 'X-Imaginary-Value']
-            })
+            .use(
+                cors({
+                    allowedHeaders: ['Content-Type', 'X-Imaginary-Value']
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))

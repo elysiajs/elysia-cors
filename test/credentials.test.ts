@@ -12,9 +12,11 @@ const req = (path: string, headers?: Record<string, string>) =>
 describe('Credentials', () => {
     it('Allow credential', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                credentials: true
-            })
+            .use(
+                cors({
+                    credentials: true
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
@@ -23,9 +25,11 @@ describe('Credentials', () => {
 
     it('Disallow credential', async () => {
         const app = new KingWorld()
-            .use(cors, {
-                credentials: false
-            })
+            .use(
+                cors({
+                    credentials: false
+                })
+            )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
