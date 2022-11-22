@@ -12,7 +12,7 @@ import KingWorld from 'kingworld'
 import cors from '@kingworldjs/cors'
 
 const app = new KingWorld()
-    .use(cors)
+    .use(cors())
     .listen(8080)
 ```
 
