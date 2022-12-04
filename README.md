@@ -1,5 +1,5 @@
 # @elysiajs/cors
-A plugin for [elysia](https://github.com/elysiajs/elysia) that for Cross Origin Requests (CORs)
+Plugin for [elysia](https://github.com/elysiajs/elysia) that for Cross Origin Requests (CORs)
 
 ## Installation
 ```bash
