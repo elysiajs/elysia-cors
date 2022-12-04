@@ -1,17 +1,17 @@
-# @kingworldjs/cors
-A plugin for [kingworld](https://github.com/elysiajs/elysia) that for Cross Origin Requests (CORs)
+# @elysiajs/cors
+A plugin for [elysia](https://github.com/elysiajs/elysia) that for Cross Origin Requests (CORs)
 
 ## Installation
 ```bash
-bun add @kingworldjs/cors
+bun add @elysiajs/cors
 ```
 
 ## Example
 ```typescript
-import KingWorld from 'kingworld'
-import cors from '@kingworldjs/cors'
+import { Elysia } from 'elysia'
+import { cors } from '@elysiajs/cors'
 
-const app = new KingWorld()
+const app = new Elysia()
     .use(cors())
     .listen(8080)
 ```
@@ -23,7 +23,7 @@ const app = new KingWorld()
 Assign the **Access-Control-Allow-Origin** header.
 
 Value can be one of the following:
-- `string` - String of origin which will be directly assign to `Access-Control-Allow-Origin`
+- `string` - String of origin which will directly assign to `Access-Control-Allow-Origin`
 
 - `boolean` - If set to true, `Access-Control-Allow-Origin` will be set to `*` (accept all origin)
 
@@ -41,7 +41,7 @@ Value can be one of the following:
     type CORSOriginFn = (context: Context) => boolean | void
     ```
 
-- `Array<string | RegExp | Function>` - Will try to find truthy value of all options above. Will accept request if one is `true`.
+- `Array<string | RegExp | Function>` - Will try to find truthy value of all options above. Will accept Request if one is `true`.
 
 ### methods
 @default `*`
