@@ -1,6 +1,5 @@
-import KingWorld from 'kingworld'
-
-import cors from '../src'
+import { Elysia } from 'elysia'
+import { cors } from '../src'
 
 import { describe, expect, it } from 'bun:test'
 
@@ -11,7 +10,7 @@ const req = (path: string, headers?: Record<string, string>) =>
 
 describe('Exposed Headers', () => {
     it('Expose single header', async () => {
-        const app = new KingWorld()
+        const app = new Elysia()
             .use(
                 cors({
                     exposedHeaders: 'Content-Type'
@@ -26,7 +25,7 @@ describe('Exposed Headers', () => {
     })
 
     it('Expose array', async () => {
-        const app = new KingWorld()
+        const app = new Elysia()
             .use(
                 cors({
                     exposedHeaders: ['Content-Type', 'X-Imaginary-Value']

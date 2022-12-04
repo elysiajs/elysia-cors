@@ -1,5 +1,5 @@
 # @kingworldjs/cors
-A plugin for [kingworld](https://github.com/saltyaom/kingworld) that for Cross Origin Requests (CORs)
+A plugin for [kingworld](https://github.com/elysiajs/elysia) that for Cross Origin Requests (CORs)
 
 ## Installation
 ```bash

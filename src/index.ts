@@ -1,6 +1,4 @@
-import type { KingWorld } from 'kingworld'
-import type { Handler } from 'kingworld'
-import type { Context } from 'kingworld/src/context'
+import type { Elysia, Handler, Context } from 'elysia'
 
 import { isAbsolute } from 'path'
 
@@ -169,7 +167,7 @@ export const cors =
             preflight: true
         }
     ) =>
-    (app: KingWorld) => {
+    (app: Elysia) => {
         const origins =
             typeof origin === 'boolean'
                 ? undefined
@@ -282,7 +280,7 @@ export const cors =
                 })
             })
 
-        app.onTransform((context) => {
+        return app.onTransform((context) => {
             handleOrigin(context)
             handleMethod(context)
 
@@ -301,8 +299,6 @@ export const cors =
             if (credentials)
                 context.set.headers['Access-Control-Allow-Credentials'] = 'true'
         })
-
-        return app
     }
 
 export default cors

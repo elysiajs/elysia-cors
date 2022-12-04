@@ -1,7 +1,7 @@
 {
-  "name": "@kingworldjs/cors",
+  "name": "@elysiajs/cors",
   "version": "0.0.0-experimental.4",
-  "description": "A plugin for kingworld that for Cross Origin Requests (CORs)",
+  "description": "A plugin for Elysia that for Cross Origin Requests (CORs)",
   "author": {
     "name": "saltyAom",
     "url": "https://github.com/SaltyAom",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/saltyaom/kingworld-cors"
+    "url": "https://github.com/elysiajs/elysia-cors"
   },
   "main": "build/index.js",
   "module": "build/es/index.js",
@@ -21,16 +21,16 @@
     "@types/node": "^18.11.7",
     "bun-types": "^0.2.2",
     "eslint": "^8.26.0",
-    "kingworld": "^0.0.0-experimental.51",
+    "elysia": "^0.0.0-experimental.56",
     "nodemon": "^2.0.20",
     "typescript": "^4.8.4"
   },
   "peerDependencies": {
-    "kingworld": ">= 0.0.0-experimental.51"
+    "elysia": ">= 0.0.0-experimental.56"
   },
-  "bugs": "https://github.com/SaltyAom/kingworld-cors/issues",
+  "bugs": "https://github.com/elysiajs/elysia-cors/issues",
   "esnext": "build/es/index.js",
-  "homepage": "https://github.com/saltyaom/kingworld-cors",
+  "homepage": "https://github.com/elysiajs/elysia-cors",
   "keywords": [
     "kingworld",
     "cors"

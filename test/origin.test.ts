@@ -1,6 +1,5 @@
-import KingWorld from 'kingworld'
-
-import cors from '../src'
+import { Elysia } from 'elysia'
+import { cors } from '../src'
 
 import { describe, expect, it } from 'bun:test'
 
@@ -11,7 +10,7 @@ const req = (path: string, headers?: Record<string, string>) =>
 
 describe('Origin', () => {
     it('Accept string', async () => {
-        const app = new KingWorld()
+        const app = new Elysia()
             .use(
                 cors({
                     origin: 'https://api.hifumin.app'
@@ -26,7 +25,7 @@ describe('Origin', () => {
     })
 
     it('Accept boolean', async () => {
-        const app = new KingWorld()
+        const app = new Elysia()
             .use(
                 cors({
                     origin: 'https://example.com'
@@ -41,7 +40,7 @@ describe('Origin', () => {
     })
 
     it('Accept RegExp', async () => {
-        const app = new KingWorld()
+        const app = new Elysia()
             .use(
                 cors({
                     origin: /\.com/g
@@ -66,7 +65,7 @@ describe('Origin', () => {
     })
 
     it('Accept Function', async () => {
-        const app = new KingWorld()
+        const app = new Elysia()
             .use(
                 cors({
                     origin: () => true
@@ -85,7 +84,7 @@ describe('Origin', () => {
     })
 
     it('Accept string[]', async () => {
-        const app = new KingWorld()
+        const app = new Elysia()
             .use(
                 cors({
                     origin: ['https://example.com', 'https://demo.app']
@@ -104,7 +103,7 @@ describe('Origin', () => {
     })
 
     it('accepts Function[]', async () => {
-        const app = new KingWorld()
+        const app = new Elysia()
             .use(
                 cors({
                     origin: ['https://demo.app', () => false, /.com/g]
