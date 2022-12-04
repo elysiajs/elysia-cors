@@ -32,7 +32,7 @@
   "esnext": "build/es/index.js",
   "homepage": "https://github.com/elysiajs/elysia-cors",
   "keywords": [
-    "kingworld",
+    "elysia",
     "cors"
   ],
   "license": "MIT",
