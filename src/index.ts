@@ -261,7 +261,7 @@ export const cors =
                 return new Response('', {
                     status: 204
                 })
-            }).options('*', (context) => {
+            }).options('/*', (context) => {
                 handleOrigin(context)
                 handleMethod(context)
 
