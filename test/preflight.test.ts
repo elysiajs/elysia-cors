@@ -23,14 +23,29 @@ describe('Preflight', () => {
         expect(res.status).toBe(204)
     })
 
-    // it('Disable preflight', async () => {
-    //     const app = new Elysia()
-    //         .use(cors, {
-    //             preflight: false
-    //         })
-    //         .get('/', () => 'HI')
+    it('Enable preflight on sub path', async () => {
+        const app = new Elysia()
+            .use(
+                cors({
+                    preflight: true
+                })
+            )
+            .get('/nested/deep', () => 'HI')
 
-    //     const res = await app.handle(req('/'))
-    //     expect(res.status).toBe(404)
-    // })
+        const res = await app.handle(req('/'))
+        expect(res.status).toBe(204)
+    })
+
+    it('Disable preflight', async () => {
+        const app = new Elysia()
+            .use(
+                cors({
+                    preflight: false
+                })
+            )
+            .get('/', () => 'HI')
+
+        const res = await app.handle(req('/'))
+        expect(res.status).toBe(404)
+    })
 })

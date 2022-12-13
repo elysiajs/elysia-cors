@@ -1,8 +1,8 @@
-import type { Elysia, Handler, Context } from 'elysia'
+import type { Elysia, Handler, PreContext } from 'elysia'
 
 import { isAbsolute } from 'path'
 
-type Origin = string | RegExp | ((context: Context) => boolean | void)
+type Origin = string | RegExp | ((request: Request) => boolean | void)
 
 export type HTTPMethod =
     | 'ACL'
@@ -177,26 +177,26 @@ export const cors =
 
         const processOrigin = (
             origin: Origin,
-            context: Context,
-            request: string
+            request: Request,
+            from: string
         ) => {
             switch (typeof origin) {
                 case 'string':
                     return origin
 
                 case 'function':
-                    return origin(context)
+                    return origin(request)
 
                 case 'object':
-                    if (origin.test(request)) return true
+                    if (origin.test(from)) return true
             }
         }
 
-        const handleOrigin = (context: Context) => {
+        const handleOrigin = (set: PreContext['set'], request: Request) => {
             // origin === `true` means any origin
             if (origin === true) {
-                context.set.headers['Vary'] = '*'
-                context.set.headers['Access-Control-Allow-Origin'] = '*'
+                set.headers['Vary'] = '*'
+                set.headers['Access-Control-Allow-Origin'] = '*'
 
                 return
             }
@@ -205,48 +205,43 @@ export const cors =
 
             const headers: string[] = []
 
-            for (let i = 0; i < origins.length; i++) {
-                const value = processOrigin(
-                    origins[i],
-                    context,
-                    context.request.headers.get('Origin') ?? ''
-                )
-                if (value === true) {
-                    context.set.headers['Vary'] = origin ? 'Origin' : '*'
-                    context.set.headers['Access-Control-Allow-Origin'] =
-                        context.request.headers.get('Origin') ?? '*'
+            if (origins.length) {
+                const from = request.headers.get('Origin') ?? ''
+                for (let i = 0; i < origins.length; i++) {
+                    const value = processOrigin(origins[i], request, from)
+                    if (value === true) {
+                        set.headers['Vary'] = origin ? 'Origin' : '*'
+                        set.headers['Access-Control-Allow-Origin'] =
+                            request.headers.get('Origin') ?? '*'
 
-                    return
+                        return
+                    }
+
+                    // value can be string (truthy value) but not `true`
+                    if (value) headers.push(value)
                 }
-
-                // value can be string (truthy value) but not `true`
-                if (value) headers.push(value)
             }
 
-            context.set.headers['Vary'] = 'Origin'
-            context.set.headers['Access-Control-Allow-Origin'] =
-                headers.join(', ')
+            set.headers['Vary'] = 'Origin'
+            set.headers['Access-Control-Allow-Origin'] = headers.join(', ')
         }
 
-        const handleMethod = (context: Context) => {
+        const handleMethod = (set: PreContext['set']) => {
             if (!methods?.length) return
 
             if (methods === '*')
-                return (context.set.headers['Access-Control-Allow-Methods'] =
-                    '*')
+                return (set.headers['Access-Control-Allow-Methods'] = '*')
 
             if (!Array.isArray(methods))
-                return (context.set.headers['Access-Control-Allow-Methods'] =
-                    methods)
+                return (set.headers['Access-Control-Allow-Methods'] = methods)
 
-            context.set.headers['Access-Control-Allow-Methods'] =
-                methods.join(', ')
+            set.headers['Access-Control-Allow-Methods'] = methods.join(', ')
         }
 
         if (preflight)
             app.options('/', (context) => {
-                handleOrigin(context)
-                handleMethod(context)
+                handleOrigin(context.set, context.request)
+                handleMethod(context.set)
 
                 if (exposedHeaders.length)
                     context.set.headers['Access-Control-Allow-Headers'] =
@@ -262,8 +257,8 @@ export const cors =
                     status: 204
                 })
             }).options('/*', (context) => {
-                handleOrigin(context)
-                handleMethod(context)
+                handleOrigin(context.set, context.request)
+                handleMethod(context.set)
 
                 if (exposedHeaders.length)
                     context.set.headers['Access-Control-Allow-Headers'] =
@@ -280,9 +275,9 @@ export const cors =
                 })
             })
 
-        return app.onTransform((context) => {
-            handleOrigin(context)
-            handleMethod(context)
+        return app.onRequest((context) => {
+            handleOrigin(context.set, context.request)
+            handleMethod(context.set)
 
             if (allowedHeaders.length)
                 context.set.headers['Access-Control-Allow-Headers'] =
