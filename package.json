@@ -1,6 +1,6 @@
 {
   "name": "@elysiajs/cors",
-  "version": "0.1.0-rc.3",
+  "version": "0.1.0-rc.4",
   "description": "Plugin for Elysia that for Cross Origin Requests (CORs)",
   "author": {
     "name": "saltyAom",
@@ -28,9 +28,7 @@
   "scripts": {
     "dev": "bun run --hot example/index.ts",
     "test": "bun wiptest",
-    "build": "rimraf dist && npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc --project tsconfig.cjs.json",
-    "build:esm": "tsc --project tsconfig.esm.json",
+    "build": "rimraf dist && tsc --project tsconfig.esm.json",
     "release": "npm run build && npm run test && npm publish --access public"
   },
   "devDependencies": {
