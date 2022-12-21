@@ -1,6 +1,6 @@
 {
   "name": "@elysiajs/cors",
-  "version": "0.1.0-rc.4",
+  "version": "0.1.0-rc.5",
   "description": "Plugin for Elysia that for Cross Origin Requests (CORs)",
   "author": {
     "name": "saltyAom",
@@ -13,7 +13,7 @@
   },
   "main": "./dist/index.js",
   "exports": {
-    "require": "./dist/cjs/index.js",
+    "require": "./dist/index.js",
     "import": "./dist/index.js",
     "node": "./dist/index.js",
     "default": "./dist/index.js"
