@@ -4,7 +4,7 @@ import { cors } from '../src'
 import { describe, expect, it } from 'bun:test'
 
 const req = (path: string, headers?: Record<string, string>) =>
-    new Request(path, {
+    new Request(`http://localhost${path}`, {
         method: 'OPTIONS',
         headers
     })

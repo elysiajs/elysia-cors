@@ -1,3 +1,7 @@
+# 0.3.0-rc.0 - 7 Mar 2023
+Improvement:
+- Add support for Elysia 0.3.0-rc.0
+
 # 0.1.0-rc.3 - 13 Dec 2022
 Change:
 - Minimum requirement for Elysia is set to 0.1.0-rc.5
