@@ -2,8 +2,7 @@ import { Elysia } from 'elysia'
 import { cors } from '../src'
 
 import { describe, expect, it } from 'bun:test'
-
-const req = (path: string) => new Request(path)
+import { req } from './utils'
 
 describe('CORS', () => {
     it('Accept all CORS by default', async () => {

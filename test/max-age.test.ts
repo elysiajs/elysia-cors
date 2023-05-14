@@ -2,12 +2,7 @@ import { Elysia } from 'elysia'
 import { cors } from '../src'
 
 import { describe, expect, it } from 'bun:test'
-
-const req = (path: string, headers?: Record<string, string>) =>
-    new Request(`http://localhost${path}`, {
-        method: 'OPTIONS',
-        headers
-    })
+import { preflight, req } from './utils'
 
 describe('Max Age', () => {
     it('Set maxage', async () => {
@@ -17,7 +12,7 @@ describe('Max Age', () => {
             })
         )
 
-        const res = await app.handle(req('/'))
+        const res = await app.handle(preflight('/'))
         expect(res.headers.get('Access-Control-Max-Age')).toBe('5')
     })
 
@@ -28,7 +23,7 @@ describe('Max Age', () => {
             })
         )
 
-        const res = await app.handle(req('/'))
+        const res = await app.handle(preflight('/'))
         expect(res.headers.get('Access-Control-Max-Age')).toBe(null)
     })
 })

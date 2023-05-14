@@ -1,6 +1,6 @@
 {
   "name": "@elysiajs/cors",
-  "version": "0.3.0",
+  "version": "0.5.0-rc.0",
   "description": "Plugin for Elysia that for Cross Origin Requests (CORs)",
   "author": {
     "name": "saltyAom",
@@ -34,12 +34,12 @@
   "devDependencies": {
     "@types/node": "^18.11.7",
     "bun-types": "^0.5.7",
-    "elysia": "^0.3.0",
+    "elysia": "0.5.0-beta.2",
     "eslint": "^8.26.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.9.4"
   },
   "peerDependencies": {
-    "elysia": ">= 0.3.0"
+    "elysia": ">= 0.5.0-beta.2"
   }
 }

@@ -275,24 +275,24 @@ export const cors =
                 })
             })
 
-        return app.onRequest((context) => {
-            handleOrigin(context.set, context.request)
-            handleMethod(context.set)
+        return app.onRequest(({ set, request }) => {
+            handleOrigin(set, request)
+            handleMethod(set)
 
             if (allowedHeaders.length)
-                context.set.headers['Access-Control-Allow-Headers'] =
+                set.headers['Access-Control-Allow-Headers'] =
                     typeof allowedHeaders === 'string'
                         ? allowedHeaders
                         : allowedHeaders.join(', ')
 
             if (exposedHeaders.length)
-                context.set.headers['Access-Control-Exposed-Headers'] =
+                set.headers['Access-Control-Exposed-Headers'] =
                     typeof exposedHeaders === 'string'
                         ? exposedHeaders
                         : exposedHeaders.join(', ')
 
             if (credentials)
-                context.set.headers['Access-Control-Allow-Credentials'] = 'true'
+                set.headers['Access-Control-Allow-Credentials'] = 'true'
         })
     }
 
