@@ -208,17 +208,20 @@ export const cors =
             if (origins.length) {
                 const from = request.headers.get('Origin') ?? ''
                 for (let i = 0; i < origins.length; i++) {
-                    const value = processOrigin(origins[i], request, from)
-                    if (value === true) {
-                        set.headers['Vary'] = origin ? 'Origin' : '*'
-                        set.headers['Access-Control-Allow-Origin'] =
-                            request.headers.get('Origin') ?? '*'
+                    const currentOrigin = origins[i];
+                    if (currentOrigin) {
+                        const value = processOrigin(currentOrigin, request, from)
+                        if (value === true) {
+                            set.headers['Vary'] = origin ? 'Origin' : '*'
+                            set.headers['Access-Control-Allow-Origin'] =
+                                request.headers.get('Origin') ?? '*'
 
-                        return
+                            return
+                        }
+
+                        // value can be string (truthy value) but not `true`
+                        if (value) headers.push(value)
                     }
-
-                    // value can be string (truthy value) but not `true`
-                    if (value) headers.push(value)
                 }
             }
 
