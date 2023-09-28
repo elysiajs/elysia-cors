@@ -1,4 +1,4 @@
-import type { Elysia, Handler, PreContext } from 'elysia'
+import { Elysia, Handler, Context } from 'elysia'
 
 import { isAbsolute } from 'path'
 
@@ -147,153 +147,157 @@ interface CORSConfig {
     preflight?: boolean
 }
 
-export const cors =
-    (
-        {
-            origin = true,
-            methods = '*',
-            allowedHeaders = '*',
-            exposedHeaders = '*',
-            credentials = false,
-            maxAge = 5,
-            preflight = true
-        }: CORSConfig = {
-            origin: true,
-            methods: '*',
-            allowedHeaders: '*',
-            exposedHeaders: '*',
-            credentials: false,
-            maxAge: 5,
-            preflight: true
+export const cors = (
+    config: CORSConfig = {
+        origin: true,
+        methods: '*',
+        allowedHeaders: '*',
+        exposedHeaders: '*',
+        credentials: false,
+        maxAge: 5,
+        preflight: true
+    }
+) => {
+    const {
+        origin = true,
+        methods = '*',
+        allowedHeaders = '*',
+        exposedHeaders = '*',
+        credentials = false,
+        maxAge = 5,
+        preflight = true
+    } = config
+
+    const app = new Elysia({
+        name: '@elysiajs/cors',
+        seed: config
+    })
+
+    const origins =
+        typeof origin === 'boolean'
+            ? undefined
+            : Array.isArray(origin)
+            ? origin
+            : [origin]
+
+    const processOrigin = (origin: Origin, request: Request, from: string) => {
+        switch (typeof origin) {
+            case 'string':
+                const protocolStart = from.indexOf('://')
+
+                // Malform URL, invalid protocol
+                if (protocolStart === -1) return false
+
+                return origin === from.slice(protocolStart + 3)
+
+            case 'function':
+                return origin(request)
+
+            case 'object':
+                return origin.test(from)
         }
-    ) =>
-    (app: Elysia) => {
-        const origins =
-            typeof origin === 'boolean'
-                ? undefined
-                : Array.isArray(origin)
-                ? origin
-                : [origin]
+    }
 
-        const processOrigin = (
-            origin: Origin,
-            request: Request,
-            from: string
-        ) => {
-            switch (typeof origin) {
-                case 'string':
-                    return origin
+    const handleOrigin = (set: Context['set'], request: Request) => {
+        // origin === `true` means any origin
+        if (origin === true) {
+            set.headers['Vary'] = '*'
+            set.headers['Access-Control-Allow-Origin'] = '*'
 
-                case 'function':
-                    return origin(request)
-
-                case 'object':
-                    if (origin.test(from)) return true
-            }
+            return
         }
 
-        const handleOrigin = (set: PreContext['set'], request: Request) => {
-            // origin === `true` means any origin
-            if (origin === true) {
-                set.headers['Vary'] = '*'
-                set.headers['Access-Control-Allow-Origin'] = '*'
+        if (!origins?.length) return
 
-                return
-            }
+        const headers: string[] = []
 
-            if (!origins?.length) return
+        if (origins.length) {
+            const from = request.headers.get('Origin') ?? ''
+            for (let i = 0; i < origins.length; i++) {
+                const value = processOrigin(origins[i], request, from)
+                if (value === true) {
+                    set.headers['Vary'] = origin ? 'Origin' : '*'
+                    set.headers['Access-Control-Allow-Origin'] =
+                        request.headers.get('Origin') ?? '*'
 
-            const headers: string[] = []
-
-            if (origins.length) {
-                const from = request.headers.get('Origin') ?? ''
-                for (let i = 0; i < origins.length; i++) {
-                    const value = processOrigin(origins[i], request, from)
-                    if (value === true) {
-                        set.headers['Vary'] = origin ? 'Origin' : '*'
-                        set.headers['Access-Control-Allow-Origin'] =
-                            request.headers.get('Origin') ?? '*'
-
-                        return
-                    }
-
-                    // value can be string (truthy value) but not `true`
-                    if (value) headers.push(value)
+                    return
                 }
+
+                // value can be string (truthy value) but not `true`
+                if (value) headers.push(value)
             }
-
-            set.headers['Vary'] = 'Origin'
-            set.headers['Access-Control-Allow-Origin'] = headers.join(', ')
         }
 
-        const handleMethod = (set: PreContext['set']) => {
-            if (!methods?.length) return
+        set.headers['Vary'] = 'Origin'
+        set.headers['Access-Control-Allow-Origin'] = headers.join(', ')
+    }
 
-            if (methods === '*')
-                return (set.headers['Access-Control-Allow-Methods'] = '*')
+    const handleMethod = (set: Context['set']) => {
+        if (!methods?.length) return
 
-            if (!Array.isArray(methods))
-                return (set.headers['Access-Control-Allow-Methods'] = methods)
+        if (methods === '*')
+            return (set.headers['Access-Control-Allow-Methods'] = '*')
 
-            set.headers['Access-Control-Allow-Methods'] = methods.join(', ')
-        }
+        if (!Array.isArray(methods))
+            return (set.headers['Access-Control-Allow-Methods'] = methods)
 
-        if (preflight)
-            app.options('/', (context) => {
-                handleOrigin(context.set, context.request)
-                handleMethod(context.set)
+        set.headers['Access-Control-Allow-Methods'] = methods.join(', ')
+    }
 
-                if (exposedHeaders.length)
-                    context.set.headers['Access-Control-Allow-Headers'] =
-                        typeof allowedHeaders === 'string'
-                            ? allowedHeaders
-                            : allowedHeaders.join(', ')
-
-                if (maxAge)
-                    context.set.headers['Access-Control-Max-Age'] =
-                        maxAge.toString()
-
-                return new Response('', {
-                    status: 204
-                })
-            }).options('/*', (context) => {
-                handleOrigin(context.set, context.request)
-                handleMethod(context.set)
-
-                if (exposedHeaders.length)
-                    context.set.headers['Access-Control-Allow-Headers'] =
-                        typeof allowedHeaders === 'string'
-                            ? allowedHeaders
-                            : allowedHeaders.join(', ')
-
-                if (maxAge)
-                    context.set.headers['Access-Control-Max-Age'] =
-                        maxAge.toString()
-
-                return new Response('', {
-                    status: 204
-                })
-            })
-
-        return app.onRequest(({ set, request }) => {
-            handleOrigin(set, request)
+    if (preflight)
+        app.options('/', ({ set, request }) => {
+            handleOrigin(set as any, request)
             handleMethod(set)
 
-            if (allowedHeaders.length)
+            if (exposedHeaders.length)
                 set.headers['Access-Control-Allow-Headers'] =
                     typeof allowedHeaders === 'string'
                         ? allowedHeaders
                         : allowedHeaders.join(', ')
 
-            if (exposedHeaders.length)
-                set.headers['Access-Control-Exposed-Headers'] =
-                    typeof exposedHeaders === 'string'
-                        ? exposedHeaders
-                        : exposedHeaders.join(', ')
+            if (maxAge)
+                set.headers['Access-Control-Max-Age'] = maxAge.toString()
 
-            if (credentials)
-                set.headers['Access-Control-Allow-Credentials'] = 'true'
+            return new Response('', {
+                status: 204
+            })
+        }).options('/*', ({ set, request }) => {
+            handleOrigin(set as any, request)
+            handleMethod(set)
+
+            if (exposedHeaders.length)
+                set.headers['Access-Control-Allow-Headers'] =
+                    typeof allowedHeaders === 'string'
+                        ? allowedHeaders
+                        : allowedHeaders.join(', ')
+
+            if (maxAge)
+                set.headers['Access-Control-Max-Age'] = maxAge.toString()
+
+            return new Response('', {
+                status: 204
+            })
         })
-    }
+
+    return app.onRequest(({ set, request }) => {
+        handleOrigin(set, request)
+        handleMethod(set)
+
+        if (allowedHeaders.length)
+            set.headers['Access-Control-Allow-Headers'] =
+                typeof allowedHeaders === 'string'
+                    ? allowedHeaders
+                    : allowedHeaders.join(', ')
+
+        if (exposedHeaders.length)
+            set.headers['Access-Control-Exposed-Headers'] =
+                typeof exposedHeaders === 'string'
+                    ? exposedHeaders
+                    : exposedHeaders.join(', ')
+
+        if (credentials)
+            set.headers['Access-Control-Allow-Credentials'] = 'true'
+    })
+}
 
 export default cors

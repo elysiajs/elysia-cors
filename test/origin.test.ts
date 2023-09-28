@@ -9,14 +9,21 @@ describe('Origin', () => {
         const app = new Elysia()
             .use(
                 cors({
-                    origin: 'https://api.hifumin.app'
+                    origin: 'saltyaom.com'
                 })
             )
-            .get('/', () => 'HI')
+            .get('/', () => 'A')
 
-        const res = await app.handle(req('/'))
+        const res = await app.fetch(
+            new Request('http://localhost/', {
+                headers: {
+                    origin: 'https://saltyaom.com'
+                }
+            })
+        )
+
         expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
-            'https://api.hifumin.app'
+            'https://saltyaom.com'
         )
     })
 
@@ -24,14 +31,14 @@ describe('Origin', () => {
         const app = new Elysia()
             .use(
                 cors({
-                    origin: 'https://example.com'
+                    origin: true
                 })
             )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
         expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
-            'https://example.com'
+            '*'
         )
     })
 
@@ -83,22 +90,25 @@ describe('Origin', () => {
         const app = new Elysia()
             .use(
                 cors({
-                    origin: ['https://example.com', 'https://demo.app']
+                    origin: ['gehenna.sh', 'saltyaom.com']
                 })
             )
-            .get('/', () => 'HI')
+            .get('/', () => 'A')
 
-        const res = await app.handle(
-            req('/', {
-                Origin: 'https://example.com'
+        const res = await app.fetch(
+            new Request('http://localhost/', {
+                headers: {
+                    origin: 'https://saltyaom.com'
+                }
             })
         )
+
         expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
-            'https://example.com, https://demo.app'
+            'https://saltyaom.com'
         )
     })
 
-    it('accepts Function[]', async () => {
+    it('Accept Function[]', async () => {
         const app = new Elysia()
             .use(
                 cors({

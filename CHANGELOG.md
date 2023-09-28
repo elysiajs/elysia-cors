@@ -1,3 +1,18 @@
+# 0.7.1 - 26 Sep 2023
+Bug fix:
+- strictly handle `string[]`
+
+# 0.7.0 - 20 Sep 2023
+- Add support for Elysia 0.7
+
+# 0.7.0-beta.0 - 18 Sep 2023
+- Add support for Elysia 0.7
+
+# 0.6.0 - 6 Aug 2023
+- Add support for Elysia 0.6
+
+# 0.6.0-rc.0 - 6 Aug 2023
+- Add support for Elysia 0.6
 # 0.5.0 - 15 May 2023
 - Add support for Elysia 0.5
 - Add CommonJS support
