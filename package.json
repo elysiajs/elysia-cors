@@ -35,7 +35,7 @@
   "devDependencies": {
     "@types/node": "^18.11.7",
     "bun-types": "^0.5.7",
-    "elysia": "0.5.12",
+    "elysia": "0.7.14",
     "eslint": "^8.26.0",
     "rimraf": "^3.0.2",
     "typescript": "^5.0.4"
