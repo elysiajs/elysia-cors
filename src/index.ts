@@ -214,7 +214,7 @@ export const cors = (
         if (origins.length) {
             const from = request.headers.get('Origin') ?? ''
             for (let i = 0; i < origins.length; i++) {
-                const value = processOrigin(origins[i], request, from)
+                const value = processOrigin(origins[i]!, request, from)
                 if (value === true) {
                     set.headers['Vary'] = origin ? 'Origin' : '*'
                     set.headers['Access-Control-Allow-Origin'] =
