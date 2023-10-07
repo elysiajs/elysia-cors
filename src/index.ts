@@ -1,6 +1,4 @@
-import { Elysia, Handler, Context } from 'elysia'
-
-import { isAbsolute } from 'path'
+import Elysia, { type Context } from 'elysia'
 
 type Origin = string | RegExp | ((request: Request) => boolean | void)
 
