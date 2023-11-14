@@ -1,3 +1,7 @@
+# 0.7.2 - 14 Nov 2023
+Bug fix:
+- Response using origin instead of '*' when presented
+
 # 0.7.1 - 26 Sep 2023
 Bug fix:
 - strictly handle `string[]`

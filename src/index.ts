@@ -1,6 +1,4 @@
-import { Elysia, Handler, Context } from 'elysia'
-
-import { isAbsolute } from 'path'
+import { Elysia, type Context } from 'elysia'
 
 type Origin = string | RegExp | ((request: Request) => boolean | void)
 
@@ -183,6 +181,7 @@ export const cors = (
     const processOrigin = (origin: Origin, request: Request, from: string) => {
         switch (typeof origin) {
             case 'string':
+                // eslint-disable-next-line no-case-declarations
                 const protocolStart = from.indexOf('://')
 
                 // Malform URL, invalid protocol
@@ -202,7 +201,7 @@ export const cors = (
         // origin === `true` means any origin
         if (origin === true) {
             set.headers['Vary'] = '*'
-            set.headers['Access-Control-Allow-Origin'] = '*'
+            set.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin') || '*'
 
             return
         }
@@ -218,7 +217,7 @@ export const cors = (
                 if (value === true) {
                     set.headers['Vary'] = origin ? 'Origin' : '*'
                     set.headers['Access-Control-Allow-Origin'] =
-                        request.headers.get('Origin') ?? '*'
+                        request.headers.get('Origin') || '*'
 
                     return
                 }
