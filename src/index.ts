@@ -103,7 +103,7 @@ interface CORSConfig {
     /**
      * @default `*`
      *
-     * Assign **Access-Control-Exposed-Headers** header.
+     * Assign **Access-Control-Expose-Headers** header.
      *
      * Return the specified headers to request in CORS mode.
      *
@@ -289,7 +289,7 @@ export const cors = (
                     : allowedHeaders.join(', ')
 
         if (exposedHeaders.length)
-            set.headers['Access-Control-Exposed-Headers'] =
+            set.headers['Access-Control-Expose-Headers'] =
                 typeof exposedHeaders === 'string'
                     ? exposedHeaders
                     : exposedHeaders.join(', ')
