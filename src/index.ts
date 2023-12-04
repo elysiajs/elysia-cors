@@ -244,32 +244,14 @@ export const cors = (
     }
 
     if (preflight)
-        app.options('/', ({ set, request }) => {
-            handleOrigin(set as any, request)
-            handleMethod(set)
-
-            if (exposedHeaders.length)
-                set.headers['Access-Control-Allow-Headers'] =
-                    typeof allowedHeaders === 'string'
-                        ? allowedHeaders
-                        : allowedHeaders.join(', ')
-
+        app.options('/', ({ set }) => {
             if (maxAge)
                 set.headers['Access-Control-Max-Age'] = maxAge.toString()
 
             return new Response('', {
                 status: 204
             })
-        }).options('/*', ({ set, request }) => {
-            handleOrigin(set as any, request)
-            handleMethod(set)
-
-            if (exposedHeaders.length)
-                set.headers['Access-Control-Allow-Headers'] =
-                    typeof allowedHeaders === 'string'
-                        ? allowedHeaders
-                        : allowedHeaders.join(', ')
-
+        }).options('/*', ({ set }) => {
             if (maxAge)
                 set.headers['Access-Control-Max-Age'] = maxAge.toString()
 
