@@ -15,7 +15,7 @@ describe('Exposed Headers', () => {
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
-        expect(res.headers.get('Access-Control-Exposed-Headers')).toBe(
+        expect(res.headers.get('Access-Control-Expose-Headers')).toBe(
             'Content-Type'
         )
     })
@@ -30,7 +30,7 @@ describe('Exposed Headers', () => {
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
-        expect(res.headers.get('Access-Control-Exposed-Headers')).toBe(
+        expect(res.headers.get('Access-Control-Expose-Headers')).toBe(
             'Content-Type, X-Imaginary-Value'
         )
     })
