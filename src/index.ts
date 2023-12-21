@@ -149,17 +149,17 @@ interface CORSConfig {
 export const cors = (
     config: CORSConfig = {
         origin: true,
-        methods: '*',
+        methods: true,
         allowedHeaders: '*',
         exposedHeaders: '*',
-        credentials: false,
+        credentials: true,
         maxAge: 5,
         preflight: true
     }
 ) => {
     const {
         origin = true,
-        methods = '*',
+        methods = true,
         allowedHeaders = '*',
         exposedHeaders = '*',
         credentials = true,
@@ -294,7 +294,8 @@ export const cors = (
                 : exposedHeaders.join(', ')
     }
 
-    if (credentials) defaultHeaders['Access-Control-Allow-Credentials'] = 'true'
+    if (credentials === true)
+        defaultHeaders['Access-Control-Allow-Credentials'] = 'true'
 
     return app.headers(defaultHeaders).onRequest(({ set, request }) => {
         handleOrigin(set, request)
