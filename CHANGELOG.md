@@ -1,3 +1,8 @@
+
+# 0.8.0-rc.0 - 15 Dec 2023
+Change:
+- Add support for Elysia 0.8
+
 # 0.7.2 - 14 Nov 2023
 Bug fix:
 - Response using origin instead of '*' when presented

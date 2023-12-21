@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import { Elysia, type Context } from 'elysia'
 
 type Origin = string | RegExp | ((request: Request) => boolean | void)
@@ -181,13 +182,15 @@ export const cors = (
     const processOrigin = (origin: Origin, request: Request, from: string) => {
         switch (typeof origin) {
             case 'string':
-                // eslint-disable-next-line no-case-declarations
                 const protocolStart = from.indexOf('://')
+                if (protocolStart !== -1)
+                    from = from.slice(protocolStart + 3)
 
-                // Malform URL, invalid protocol
-                if (protocolStart === -1) return false
+                const trailingSlash = from.indexOf('/', 0)
+                if (trailingSlash !== -1)
+                    from = from.slice(trailingSlash)
 
-                return origin === from.slice(protocolStart + 3)
+                return origin === from
 
             case 'function':
                 return origin(request)
