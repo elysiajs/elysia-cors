@@ -1,3 +1,13 @@
+# 0.8.0-rc.1 - 21 Dec 2023
+Improvement:
+- Using `Elysia.headers` to set default headers
+- Get value of static field ahead of time
+
+Change:
+- set `credential` to `true` by default
+
+Bug fix:
+- origin with out protocol is now handle
 
 # 0.8.0-rc.0 - 15 Dec 2023
 Change:

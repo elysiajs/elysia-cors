@@ -85,7 +85,7 @@ interface CORSConfig {
      * - `HTTPMethod[]` - Allow multiple HTTP methods.
      * - eg: ['GET', 'PUT', 'POST']
      */
-    methods?: undefined | null | '' | '*' | HTTPMethod | HTTPMethod[]
+    methods?: boolean | undefined | null | '' | '*' | HTTPMethod | HTTPMethod[]
     /**
      * @default `*`
      *
@@ -117,7 +117,7 @@ interface CORSConfig {
      */
     exposedHeaders?: string | string[]
     /**
-     * @default `false`
+     * @default `true`
      *
      * Assign **Access-Control-Allow-Credentials** header.
      *
@@ -162,7 +162,7 @@ export const cors = (
         methods = '*',
         allowedHeaders = '*',
         exposedHeaders = '*',
-        credentials = false,
+        credentials = true,
         maxAge = 5,
         preflight = true
     } = config
@@ -183,12 +183,10 @@ export const cors = (
         switch (typeof origin) {
             case 'string':
                 const protocolStart = from.indexOf('://')
-                if (protocolStart !== -1)
-                    from = from.slice(protocolStart + 3)
+                if (protocolStart !== -1) from = from.slice(protocolStart + 3)
 
                 const trailingSlash = from.indexOf('/', 0)
-                if (trailingSlash !== -1)
-                    from = from.slice(trailingSlash)
+                if (trailingSlash !== -1) from = from.slice(trailingSlash)
 
                 return origin === from
 
@@ -204,7 +202,8 @@ export const cors = (
         // origin === `true` means any origin
         if (origin === true) {
             set.headers['Vary'] = '*'
-            set.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin') || '*'
+            set.headers['Access-Control-Allow-Origin'] =
+                request.headers.get('Origin') || '*'
 
             return
         }
@@ -234,8 +233,11 @@ export const cors = (
         set.headers['Access-Control-Allow-Origin'] = headers.join(', ')
     }
 
-    const handleMethod = (set: Context['set']) => {
-        if (!methods?.length) return
+    const handleMethod = (set: Context['set'], method: string) => {
+        if (methods === true)
+            return (set.headers['Access-Control-Allow-Methods'] = method ?? '*')
+
+        if (methods === false || !methods?.length) return
 
         if (methods === '*')
             return (set.headers['Access-Control-Allow-Methods'] = '*')
@@ -249,7 +251,7 @@ export const cors = (
     if (preflight)
         app.options('/', ({ set, request }) => {
             handleOrigin(set as any, request)
-            handleMethod(set)
+            handleMethod(set, request.method)
 
             if (exposedHeaders.length)
                 set.headers['Access-Control-Allow-Headers'] =
@@ -265,7 +267,7 @@ export const cors = (
             })
         }).options('/*', ({ set, request }) => {
             handleOrigin(set as any, request)
-            handleMethod(set)
+            handleMethod(set, request.method)
 
             if (exposedHeaders.length)
                 set.headers['Access-Control-Allow-Headers'] =
@@ -281,24 +283,22 @@ export const cors = (
             })
         })
 
-    return app.onRequest(({ set, request }) => {
+    const defaultHeaders: Record<string, string> = {
+        'Access-Control-Allow-Headers':
+            typeof allowedHeaders === 'string'
+                ? allowedHeaders
+                : allowedHeaders.join(', '),
+        'Access-Control-Exposed-Headers':
+            typeof exposedHeaders === 'string'
+                ? exposedHeaders
+                : exposedHeaders.join(', ')
+    }
+
+    if (credentials) defaultHeaders['Access-Control-Allow-Credentials'] = 'true'
+
+    return app.headers(defaultHeaders).onRequest(({ set, request }) => {
         handleOrigin(set, request)
-        handleMethod(set)
-
-        if (allowedHeaders.length)
-            set.headers['Access-Control-Allow-Headers'] =
-                typeof allowedHeaders === 'string'
-                    ? allowedHeaders
-                    : allowedHeaders.join(', ')
-
-        if (exposedHeaders.length)
-            set.headers['Access-Control-Exposed-Headers'] =
-                typeof exposedHeaders === 'string'
-                    ? exposedHeaders
-                    : exposedHeaders.join(', ')
-
-        if (credentials)
-            set.headers['Access-Control-Allow-Credentials'] = 'true'
+        handleMethod(set, request.method)
     })
 }
 
