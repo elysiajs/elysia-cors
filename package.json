@@ -1,46 +1,46 @@
 {
-  "name": "@elysiajs/cors",
-  "version": "0.8.0-rc.1",
-  "description": "Plugin for Elysia that for Cross Origin Requests (CORs)",
-  "author": {
-    "name": "saltyAom",
-    "url": "https://github.com/SaltyAom",
-    "email": "saltyaom@gmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/elysiajs/elysia-cors"
-  },
-  "exports": {
-    "bun": "./dist/index.js",
-    "node": "./dist/cjs/index.js",
-    "require": "./dist/cjs/index.js",
-    "import": "./dist/index.js",
-    "default": "./dist/cjs/index.js"
-  },
-  "types": "./src/index.ts",
-  "homepage": "https://github.com/elysiajs/elysia-cors",
-  "keywords": [
-    "elysia",
-    "cors"
-  ],
-  "license": "MIT",
-  "scripts": {
-    "dev": "bun run --watch example/index.ts",
-    "test": "bun test && npm run test:node",
-    "test:node": "npm install --prefix ./test/node/cjs/ && npm install --prefix ./test/node/esm/ && node ./test/node/cjs/index.js && node ./test/node/esm/index.js",
-    "build": "rimraf dist && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
-    "release": "npm run build && npm run test && npm publish --access public"
-  },
-  "devDependencies": {
-    "@types/node": "^18.11.7",
-    "bun-types": "^1.0.2",
-    "elysia": "0.8.0-rc.7",
-    "eslint": "^8.26.0",
-    "rimraf": "^3.0.2",
-    "typescript": "^5.2.2"
-  },
-  "peerDependencies": {
-    "elysia": ">= 0.8.0-rc.7"
-  }
+    "name": "@elysiajs/cors",
+    "version": "0.8.0",
+    "description": "Plugin for Elysia that for Cross Origin Requests (CORs)",
+    "author": {
+        "name": "saltyAom",
+        "url": "https://github.com/SaltyAom",
+        "email": "saltyaom@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/elysiajs/elysia-cors"
+    },
+    "exports": {
+        "bun": "./dist/index.js",
+        "node": "./dist/cjs/index.js",
+        "require": "./dist/cjs/index.js",
+        "import": "./dist/index.js",
+        "default": "./dist/cjs/index.js"
+    },
+    "types": "./src/index.ts",
+    "homepage": "https://github.com/elysiajs/elysia-cors",
+    "keywords": [
+        "elysia",
+        "cors"
+    ],
+    "license": "MIT",
+    "scripts": {
+        "dev": "bun run --watch example/index.ts",
+        "test": "bun test && npm run test:node",
+        "test:node": "npm install --prefix ./test/node/cjs/ && npm install --prefix ./test/node/esm/ && node ./test/node/cjs/index.js && node ./test/node/esm/index.js",
+        "build": "rimraf dist && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+        "release": "npm run build && npm run test && npm publish --access public"
+    },
+    "devDependencies": {
+        "@types/node": "^18.11.7",
+        "bun-types": "^1.0.2",
+        "elysia": "0.8.0",
+        "eslint": "^8.26.0",
+        "rimraf": "^3.0.2",
+        "typescript": "^5.2.2"
+    },
+    "peerDependencies": {
+        "elysia": ">= 0.8.0"
+    }
 }
