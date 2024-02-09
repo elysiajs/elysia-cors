@@ -41,6 +41,12 @@ export type HTTPMethod =
 
 interface CORSConfig {
     /**
+     * Disable AOT (Ahead of Time) compilation for plugin instance
+     *
+     * @default true
+     */
+    aot?: boolean
+    /**
      * @default `true`
      *
      * Assign the **Access-Control-Allow-Origin** header.
@@ -146,8 +152,37 @@ interface CORSConfig {
     preflight?: boolean
 }
 
+const processOrigin = (
+    origin: Origin,
+    request: Request,
+    from: string
+): boolean => {
+    if (Array.isArray(origin))
+        origin.some((o) => processOrigin(o, request, from))
+
+    switch (typeof origin) {
+        case 'string':
+            const protocolStart = from.indexOf('://')
+            if (protocolStart !== -1) from = from.slice(protocolStart + 3)
+
+            const trailingSlash = from.indexOf('/', 0)
+            if (trailingSlash !== -1) from = from.slice(trailingSlash)
+
+            return origin === from
+
+        case 'function':
+            return origin(request) === true
+
+        case 'object':
+            if (origin instanceof RegExp) return origin.test(from)
+    }
+
+    return false
+}
+
 export const cors = (
     config: CORSConfig = {
+        aot: true,
         origin: true,
         methods: true,
         allowedHeaders: '*',
@@ -158,6 +193,7 @@ export const cors = (
     }
 ) => {
     const {
+        aot = true,
         origin = true,
         methods = true,
         allowedHeaders = '*',
@@ -169,7 +205,8 @@ export const cors = (
 
     const app = new Elysia({
         name: '@elysiajs/cors',
-        seed: config
+        seed: config,
+        aot: false
     })
 
     const origins =
@@ -178,25 +215,6 @@ export const cors = (
             : Array.isArray(origin)
             ? origin
             : [origin]
-
-    const processOrigin = (origin: Origin, request: Request, from: string) => {
-        switch (typeof origin) {
-            case 'string':
-                const protocolStart = from.indexOf('://')
-                if (protocolStart !== -1) from = from.slice(protocolStart + 3)
-
-                const trailingSlash = from.indexOf('/', 0)
-                if (trailingSlash !== -1) from = from.slice(trailingSlash)
-
-                return origin === from
-
-            case 'function':
-                return origin(request)
-
-            case 'object':
-                return origin.test(from)
-        }
-    }
 
     const handleOrigin = (set: Context['set'], request: Request) => {
         // origin === `true` means any origin
@@ -218,8 +236,7 @@ export const cors = (
                 const value = processOrigin(origins[i]!, request, from)
                 if (value === true) {
                     set.headers['Vary'] = origin ? 'Origin' : '*'
-                    set.headers['Access-Control-Allow-Origin'] =
-                        from || '*'
+                    set.headers['Access-Control-Allow-Origin'] = from || '*'
 
                     return
                 }
@@ -297,7 +314,15 @@ export const cors = (
     if (credentials === true)
         defaultHeaders['Access-Control-Allow-Credentials'] = 'true'
 
-    return app.headers(defaultHeaders).onRequest(({ set, request }) => {
+    if (app.headers)
+        return app.headers(defaultHeaders).onRequest(({ set, request }) => {
+            handleOrigin(set, request)
+            handleMethod(set, request.method)
+        })
+
+    return app.onRequest(({ set, request }) => {
+        Object.assign(set.headers, defaultHeaders)
+
         handleOrigin(set, request)
         handleMethod(set, request.method)
     })
