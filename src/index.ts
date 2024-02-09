@@ -219,7 +219,7 @@ export const cors = (
                 if (value === true) {
                     set.headers['Vary'] = origin ? 'Origin' : '*'
                     set.headers['Access-Control-Allow-Origin'] =
-                        request.headers.get('Origin') || '*'
+                        from || '*'
 
                     return
                 }
@@ -253,7 +253,7 @@ export const cors = (
             handleOrigin(set as any, request)
             handleMethod(set, request.method)
 
-            if (exposedHeaders.length)
+            if (allowedHeaders.length)
                 set.headers['Access-Control-Allow-Headers'] =
                     typeof allowedHeaders === 'string'
                         ? allowedHeaders
@@ -262,14 +262,14 @@ export const cors = (
             if (maxAge)
                 set.headers['Access-Control-Max-Age'] = maxAge.toString()
 
-            return new Response('', {
+            return new Response(null, {
                 status: 204
             })
         }).options('/*', ({ set, request }) => {
             handleOrigin(set as any, request)
             handleMethod(set, request.method)
 
-            if (exposedHeaders.length)
+            if (allowedHeaders.length)
                 set.headers['Access-Control-Allow-Headers'] =
                     typeof allowedHeaders === 'string'
                         ? allowedHeaders
@@ -278,7 +278,7 @@ export const cors = (
             if (maxAge)
                 set.headers['Access-Control-Max-Age'] = maxAge.toString()
 
-            return new Response('', {
+            return new Response(null, {
                 status: 204
             })
         })

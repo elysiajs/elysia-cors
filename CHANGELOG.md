@@ -1,3 +1,13 @@
+
+# 1.0.0-beta.0 - 6 Feb 2024
+Change:
+- Add support for Elysia 1.0
+
+
+# 0.8.0 - 23 Dec 2023
+Change:
+- Add support for Elysia 0.8
+
 # 0.8.0-rc.1 - 21 Dec 2023
 Improvement:
 - Using `Elysia.headers` to set default headers
