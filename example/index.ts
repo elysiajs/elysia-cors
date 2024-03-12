@@ -8,6 +8,11 @@ const app = new Elysia()
         })
     )
     .get('/', () => 'A')
+    .post('/', ({ body, cookie: { session } }) => {
+        session!.value = 'hi'
+
+        return body
+    })
     .listen(3000)
 
 console.log(`Elysia is running at ${app.server?.hostname}:${app.server?.port}`)
@@ -18,6 +23,8 @@ app.handle(
             origin: 'https://saltyaom.com'
         }
     })
-).then(x => x.headers.toJSON()).then(console.log)
+)
+    .then((x) => x.headers.toJSON())
+    .then(console.log)
 
 export type App = typeof app

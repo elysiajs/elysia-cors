@@ -158,7 +158,7 @@ const processOrigin = (
     from: string
 ): boolean => {
     if (Array.isArray(origin))
-        origin.some((o) => processOrigin(o, request, from))
+        return origin.some((o) => processOrigin(o, request, from))
 
     switch (typeof origin) {
         case 'string':
@@ -192,10 +192,10 @@ export const cors = (
         preflight: true
     }
 ) => {
-    const {
+    let {
         aot = true,
-        origin = true,
-        methods = true,
+        origin = '*',
+        methods = '*',
         allowedHeaders = '*',
         exposedHeaders = '*',
         credentials = true,
@@ -203,11 +203,11 @@ export const cors = (
         preflight = true
     } = config
 
-    const app = new Elysia({
-        name: '@elysiajs/cors',
-        seed: config,
-        aot: false
-    })
+    if (Array.isArray(allowedHeaders))
+        allowedHeaders = allowedHeaders.join(', ')
+
+    if (Array.isArray(exposedHeaders))
+        exposedHeaders = exposedHeaders.join(', ')
 
     const origins =
         typeof origin === 'boolean'
@@ -216,12 +216,27 @@ export const cors = (
             ? origin
             : [origin]
 
+    const app = new Elysia({
+        name: '@elysiajs/cors',
+        seed: config,
+        aot
+    })
+
+    const anyOrigin = origins?.some((o) => o === '*')
+
     const handleOrigin = (set: Context['set'], request: Request) => {
         // origin === `true` means any origin
         if (origin === true) {
             set.headers['Vary'] = '*'
             set.headers['Access-Control-Allow-Origin'] =
                 request.headers.get('Origin') || '*'
+
+            return
+        }
+
+        if (anyOrigin) {
+            set.headers['Vary'] = '*'
+            set.headers['Access-Control-Allow-Origin'] = '*'
 
             return
         }
@@ -272,9 +287,11 @@ export const cors = (
 
             if (allowedHeaders.length)
                 set.headers['Access-Control-Allow-Headers'] =
-                    typeof allowedHeaders === 'string'
-                        ? allowedHeaders
-                        : allowedHeaders.join(', ')
+                    allowedHeaders as string
+
+            if (exposedHeaders.length)
+                set.headers['Access-Control-Expose-Headers'] =
+                    exposedHeaders as string
 
             if (maxAge)
                 set.headers['Access-Control-Max-Age'] = maxAge.toString()
@@ -288,9 +305,11 @@ export const cors = (
 
             if (allowedHeaders.length)
                 set.headers['Access-Control-Allow-Headers'] =
-                    typeof allowedHeaders === 'string'
-                        ? allowedHeaders
-                        : allowedHeaders.join(', ')
+                    allowedHeaders as string
+
+            if (exposedHeaders.length)
+                set.headers['Access-Control-Expose-Headers'] =
+                    exposedHeaders as string
 
             if (maxAge)
                 set.headers['Access-Control-Max-Age'] = maxAge.toString()
@@ -301,30 +320,24 @@ export const cors = (
         })
 
     const defaultHeaders: Record<string, string> = {
-        'Access-Control-Allow-Headers':
-            typeof allowedHeaders === 'string'
-                ? allowedHeaders
-                : allowedHeaders.join(', '),
-        'Access-Control-Exposed-Headers':
-            typeof exposedHeaders === 'string'
-                ? exposedHeaders
-                : exposedHeaders.join(', ')
+        'Access-Control-Allow-Headers': allowedHeaders,
+        'Access-Control-Exposed-Headers': exposedHeaders
     }
 
     if (credentials === true)
         defaultHeaders['Access-Control-Allow-Credentials'] = 'true'
 
-    if (app.headers)
-        return app.headers(defaultHeaders).onRequest(({ set, request }) => {
-            handleOrigin(set, request)
-            handleMethod(set, request.method)
-        })
-
-    return app.onRequest(({ set, request }) => {
-        Object.assign(set.headers, defaultHeaders)
-
+    return app.headers(defaultHeaders).onRequest(({ set, request }) => {
         handleOrigin(set, request)
         handleMethod(set, request.method)
+
+        if (allowedHeaders.length)
+            set.headers['Access-Control-Allow-Headers'] =
+                allowedHeaders as string
+
+        if (exposedHeaders.length)
+            set.headers['Access-Control-Expose-Headers'] =
+                exposedHeaders as string
     })
 }
 
