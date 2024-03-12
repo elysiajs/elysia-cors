@@ -181,16 +181,7 @@ const processOrigin = (
 }
 
 export const cors = (
-    config: CORSConfig = {
-        aot: true,
-        origin: true,
-        methods: true,
-        allowedHeaders: '*',
-        exposedHeaders: '*',
-        credentials: true,
-        maxAge: 5,
-        preflight: true
-    }
+    config?: CORSConfig
 ) => {
     let {
         aot = true,
@@ -201,7 +192,7 @@ export const cors = (
         credentials = true,
         maxAge = 5,
         preflight = true
-    } = config
+    } = config ?? {}
 
     if (Array.isArray(allowedHeaders))
         allowedHeaders = allowedHeaders.join(', ')
