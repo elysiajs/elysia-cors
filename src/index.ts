@@ -1,43 +1,43 @@
 /* eslint-disable no-case-declarations */
-import { Elysia, type Context } from 'elysia'
+import { Elysia, type Context } from "elysia";
 
-type Origin = string | RegExp | ((request: Request) => boolean | void)
+type Origin = string | RegExp | ((request: Request) => boolean | void);
 
 export type HTTPMethod =
-    | 'ACL'
-    | 'BIND'
-    | 'CHECKOUT'
-    | 'CONNECT'
-    | 'COPY'
-    | 'DELETE'
-    | 'GET'
-    | 'HEAD'
-    | 'LINK'
-    | 'LOCK'
-    | 'M-SEARCH'
-    | 'MERGE'
-    | 'MKACTIVITY'
-    | 'MKCALENDAR'
-    | 'MKCOL'
-    | 'MOVE'
-    | 'NOTIFY'
-    | 'OPTIONS'
-    | 'PATCH'
-    | 'POST'
-    | 'PROPFIND'
-    | 'PROPPATCH'
-    | 'PURGE'
-    | 'PUT'
-    | 'REBIND'
-    | 'REPORT'
-    | 'SEARCH'
-    | 'SOURCE'
-    | 'SUBSCRIBE'
-    | 'TRACE'
-    | 'UNBIND'
-    | 'UNLINK'
-    | 'UNLOCK'
-    | 'UNSUBSCRIBE'
+    | "ACL"
+    | "BIND"
+    | "CHECKOUT"
+    | "CONNECT"
+    | "COPY"
+    | "DELETE"
+    | "GET"
+    | "HEAD"
+    | "LINK"
+    | "LOCK"
+    | "M-SEARCH"
+    | "MERGE"
+    | "MKACTIVITY"
+    | "MKCALENDAR"
+    | "MKCOL"
+    | "MOVE"
+    | "NOTIFY"
+    | "OPTIONS"
+    | "PATCH"
+    | "POST"
+    | "PROPFIND"
+    | "PROPPATCH"
+    | "PURGE"
+    | "PUT"
+    | "REBIND"
+    | "REPORT"
+    | "SEARCH"
+    | "SOURCE"
+    | "SUBSCRIBE"
+    | "TRACE"
+    | "UNBIND"
+    | "UNLINK"
+    | "UNLOCK"
+    | "UNSUBSCRIBE";
 
 interface CORSConfig {
     /**
@@ -45,7 +45,7 @@ interface CORSConfig {
      *
      * @default true
      */
-    aot?: boolean
+    aot?: boolean;
     /**
      * @default `true`
      *
@@ -73,7 +73,7 @@ interface CORSConfig {
      *
      * - `Array<string | RegExp | Function>` - Will try to find truthy value of all options above. Will accept request if one is `true`.
      */
-    origin?: Origin | boolean | Origin[]
+    origin?: Origin | boolean | Origin[];
     /**
      * @default `*`
      *
@@ -91,7 +91,7 @@ interface CORSConfig {
      * - `HTTPMethod[]` - Allow multiple HTTP methods.
      * - eg: ['GET', 'PUT', 'POST']
      */
-    methods?: boolean | undefined | null | '' | '*' | HTTPMethod | HTTPMethod[]
+    methods?: boolean | undefined | null | "" | "*" | HTTPMethod | HTTPMethod[];
     /**
      * @default `*`
      *
@@ -106,11 +106,11 @@ interface CORSConfig {
      * - `string[]` - Allow multiple HTTP methods.
      *     - eg: ['Content-Type', 'Authorization']
      */
-    allowedHeaders?: string | string[]
+    allowedHeaders?: true | string | string[];
     /**
      * @default `*`
      *
-     * Assign **Access-Control-Exposed-Headers** header.
+     * Assign **Access-Control-Expose-Headers** header.
      *
      * Return the specified headers to request in CORS mode.
      *
@@ -121,7 +121,7 @@ interface CORSConfig {
      * - `string[]` - Allow multiple HTTP methods.
      *     - eg: ['Content-Type', 'X-Powered-By']
      */
-    exposedHeaders?: string | string[]
+    exposeHeaders?: true | string | string[];
     /**
      * @default `true`
      *
@@ -131,7 +131,7 @@ interface CORSConfig {
      *
      * - `boolean` - Available if set to `true`.
      */
-    credentials?: boolean
+    credentials?: boolean;
     /**
      * @default `5`
      *
@@ -141,7 +141,7 @@ interface CORSConfig {
      *
      * - `number` - Duration in seconds to indicates how long the results of a preflight request can be cached.
      */
-    maxAge?: number
+    maxAge?: number;
     /**
      * @default `true`
      *
@@ -149,187 +149,211 @@ interface CORSConfig {
      *
      * - `boolean` - Available if set to `true`.
      */
-    preflight?: boolean
+    preflight?: boolean;
 }
+
+const isBun = typeof new Headers()?.toJSON === "function";
+
+/**
+ * This function is use when headers config is true.
+ * Attempts to process headers based on request headers.
+ */
+const processHeaders = (headers: Headers) => {
+    if (isBun) return Object.keys(headers.toJSON()).join(", ");
+
+    let keys = "";
+
+    headers.forEach((_, key) => {
+        keys += key + ", ";
+    });
+
+    if (keys) keys = keys.slice(0, -1);
+
+    return keys;
+};
 
 const processOrigin = (
     origin: Origin,
     request: Request,
-    from: string
+    from: string,
 ): boolean => {
     if (Array.isArray(origin))
-        return origin.some((o) => processOrigin(o, request, from))
+        return origin.some((o) => processOrigin(o, request, from));
 
     switch (typeof origin) {
-        case 'string':
-            const protocolStart = from.indexOf('://')
-            if (protocolStart !== -1) from = from.slice(protocolStart + 3)
+        case "string":
+            if(origin.indexOf("://") === -1)
+                return from.includes(origin);
 
-            const trailingSlash = from.indexOf('/', 0)
-            if (trailingSlash !== -1) from = from.slice(trailingSlash)
+            return origin === from;
 
-            return origin === from
+        case "function":
+            return origin(request) === true;
 
-        case 'function':
-            return origin(request) === true
-
-        case 'object':
-            if (origin instanceof RegExp) return origin.test(from)
+        case "object":
+            if (origin instanceof RegExp) return origin.test(from);
     }
 
-    return false
-}
+    return false;
+};
 
-export const cors = (
-    config?: CORSConfig
-) => {
+export const cors = (config?: CORSConfig) => {
     let {
         aot = true,
-        origin = '*',
-        methods = '*',
-        allowedHeaders = '*',
-        exposedHeaders = '*',
+        origin = true,
+        methods = true,
+        allowedHeaders = true,
+        exposeHeaders = true,
         credentials = true,
         maxAge = 5,
-        preflight = true
-    } = config ?? {}
+        preflight = true,
+    } = config ?? {};
 
     if (Array.isArray(allowedHeaders))
-        allowedHeaders = allowedHeaders.join(', ')
+        allowedHeaders = allowedHeaders.join(", ");
 
-    if (Array.isArray(exposedHeaders))
-        exposedHeaders = exposedHeaders.join(', ')
+    if (Array.isArray(exposeHeaders)) exposeHeaders = exposeHeaders.join(", ");
 
     const origins =
-        typeof origin === 'boolean'
+        typeof origin === "boolean"
             ? undefined
             : Array.isArray(origin)
-            ? origin
-            : [origin]
+              ? origin
+              : [origin];
 
     const app = new Elysia({
-        name: '@elysiajs/cors',
+        name: "@elysiajs/cors",
         seed: config,
-        aot
-    })
+        aot,
+    });
 
-    const anyOrigin = origins?.some((o) => o === '*')
+    const anyOrigin = origins?.some((o) => o === "*");
 
-    const handleOrigin = (set: Context['set'], request: Request) => {
+    const handleOrigin = (set: Context["set"], request: Request) => {
         // origin === `true` means any origin
         if (origin === true) {
-            set.headers['Vary'] = '*'
-            set.headers['Access-Control-Allow-Origin'] =
-                request.headers.get('Origin') || '*'
+            set.headers["Vary"] = "*";
+            set.headers["Access-Control-Allow-Origin"] =
+                request.headers.get("Origin") || "*";
 
-            return
+            return;
         }
 
         if (anyOrigin) {
-            set.headers['Vary'] = '*'
-            set.headers['Access-Control-Allow-Origin'] = '*'
+            set.headers["Vary"] = "*";
+            set.headers["Access-Control-Allow-Origin"] = "*";
 
-            return
+            return;
         }
 
-        if (!origins?.length) return
+        if (!origins?.length) return;
 
-        const headers: string[] = []
+        const headers: string[] = [];
 
         if (origins.length) {
-            const from = request.headers.get('Origin') ?? ''
+            const from = request.headers.get("Origin") ?? "";
             for (let i = 0; i < origins.length; i++) {
-                const value = processOrigin(origins[i]!, request, from)
+                const value = processOrigin(origins[i]!, request, from);
                 if (value === true) {
-                    set.headers['Vary'] = origin ? 'Origin' : '*'
-                    set.headers['Access-Control-Allow-Origin'] = from || '*'
+                    set.headers["Vary"] = origin ? "Origin" : "*";
+                    set.headers["Access-Control-Allow-Origin"] = from || "*";
 
-                    return
+                    return;
                 }
 
                 // value can be string (truthy value) but not `true`
-                if (value) headers.push(value)
+                if (value) headers.push(value);
             }
         }
 
-        set.headers['Vary'] = 'Origin'
-        set.headers['Access-Control-Allow-Origin'] = headers.join(', ')
-    }
+        set.headers["Vary"] = "Origin";
+        if (headers.length)
+            set.headers["Access-Control-Allow-Origin"] = headers.join(", ");
+    };
 
-    const handleMethod = (set: Context['set'], method: string) => {
+    const handleMethod = (set: Context["set"], method: string) => {
         if (methods === true)
-            return (set.headers['Access-Control-Allow-Methods'] = method ?? '*')
+            return (set.headers["Access-Control-Allow-Methods"] =
+                method ?? "*");
 
-        if (methods === false || !methods?.length) return
+        if (methods === false || !methods?.length) return;
 
-        if (methods === '*')
-            return (set.headers['Access-Control-Allow-Methods'] = '*')
+        if (methods === "*")
+            return (set.headers["Access-Control-Allow-Methods"] = "*");
 
         if (!Array.isArray(methods))
-            return (set.headers['Access-Control-Allow-Methods'] = methods)
+            return (set.headers["Access-Control-Allow-Methods"] = methods);
 
-        set.headers['Access-Control-Allow-Methods'] = methods.join(', ')
-    }
+        set.headers["Access-Control-Allow-Methods"] = methods.join(", ");
+    };
 
-    if (preflight)
-        app.options('/', ({ set, request }) => {
-            handleOrigin(set as any, request)
-            handleMethod(set, request.method)
+    const defaultHeaders: Record<string, string> = {};
 
-            if (allowedHeaders.length)
-                set.headers['Access-Control-Allow-Headers'] =
-                    allowedHeaders as string
+    if (typeof exposeHeaders === "string")
+        defaultHeaders["Access-Control-Expose-Headers"] = exposeHeaders;
 
-            if (exposedHeaders.length)
-                set.headers['Access-Control-Expose-Headers'] =
-                    exposedHeaders as string
-
-            if (maxAge)
-                set.headers['Access-Control-Max-Age'] = maxAge.toString()
-
-            return new Response(null, {
-                status: 204
-            })
-        }).options('/*', ({ set, request }) => {
-            handleOrigin(set as any, request)
-            handleMethod(set, request.method)
-
-            if (allowedHeaders.length)
-                set.headers['Access-Control-Allow-Headers'] =
-                    allowedHeaders as string
-
-            if (exposedHeaders.length)
-                set.headers['Access-Control-Expose-Headers'] =
-                    exposedHeaders as string
-
-            if (maxAge)
-                set.headers['Access-Control-Max-Age'] = maxAge.toString()
-
-            return new Response(null, {
-                status: 204
-            })
-        })
-
-    const defaultHeaders: Record<string, string> = {
-        'Access-Control-Allow-Headers': allowedHeaders,
-        'Access-Control-Exposed-Headers': exposedHeaders
-    }
+    if (typeof allowedHeaders === "string")
+        defaultHeaders["Access-Control-Allow-Headers"] = allowedHeaders;
 
     if (credentials === true)
-        defaultHeaders['Access-Control-Allow-Credentials'] = 'true'
+        defaultHeaders["Access-Control-Allow-Credentials"] = "true";
 
-    return app.headers(defaultHeaders).onRequest(({ set, request }) => {
-        handleOrigin(set, request)
-        handleMethod(set, request.method)
+    app.headers(defaultHeaders);
 
-        if (allowedHeaders.length)
-            set.headers['Access-Control-Allow-Headers'] =
-                allowedHeaders as string
+    if (preflight)
+        app.options("/", ({ set, request }) => {
+            handleOrigin(set as any, request);
+            handleMethod(set, request.method);
 
-        if (exposedHeaders.length)
-            set.headers['Access-Control-Expose-Headers'] =
-                exposedHeaders as string
-    })
-}
+            if (maxAge)
+                set.headers["Access-Control-Max-Age"] = maxAge.toString();
 
-export default cors
+            if (allowedHeaders === true || exposeHeaders === true) {
+                const headers = processHeaders(request.headers);
+
+                if (allowedHeaders === true)
+                    set.headers["Access-Control-Allow-Headers"] = headers;
+                if (exposeHeaders === true)
+                    set.headers["Access-Control-Expose-Headers"] = headers;
+            }
+
+            return new Response(null, {
+                status: 204,
+            });
+        }).options("/*", ({ set, request }) => {
+            handleOrigin(set as any, request);
+            handleMethod(set, request.method);
+
+            if (allowedHeaders === true || exposeHeaders === true) {
+                const headers = processHeaders(request.headers);
+
+                if (allowedHeaders === true)
+                    set.headers["Access-Control-Allow-Headers"] = headers;
+                if (exposeHeaders === true)
+                    set.headers["Access-Control-Expose-Headers"] = headers;
+            }
+
+            if (maxAge)
+                set.headers["Access-Control-Max-Age"] = maxAge.toString();
+
+            return new Response(null, {
+                status: 204,
+            });
+        });
+
+    return app.onRequest(({ set, request }) => {
+        handleOrigin(set, request);
+        handleMethod(set, request.method);
+
+        if (allowedHeaders === true || exposeHeaders === true) {
+            const headers = processHeaders(request.headers);
+
+            if (allowedHeaders === true)
+                set.headers["Access-Control-Allow-Headers"] = headers;
+            if (exposeHeaders === true)
+                set.headers["Access-Control-Expose-Headers"] = headers;
+        }
+    });
+};
+
+export default cors;

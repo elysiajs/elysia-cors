@@ -61,7 +61,7 @@ describe('Origin', () => {
                 Origin: 'https://example.com'
             })
         )
-        expect(notAllowed.headers.get('Access-Control-Allow-Origin')).toBe('')
+        expect(notAllowed.headers.get('Access-Control-Allow-Origin')).toBe(null)
         expect(allowed.headers.get('Access-Control-Allow-Origin')).toBe(
             'https://example.com'
         )

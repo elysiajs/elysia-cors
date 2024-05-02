@@ -1,3 +1,14 @@
+# 1.0.3 - 18 Mar 2024
+Feature:
+- add `true` to allowHeaders, and exposeHeaders
+
+Breaking Change:
+- rename `exposedHeaders` to `exposeHeaders`
+
+Change:
+- using `true` on methods, allowHeaders, and exposeHeaders by default
+- using strict origin processing as per spec
+- add support for predefined origin to handle any protocol
 
 # 1.0.2 - 18 Mar 2024
 Change:

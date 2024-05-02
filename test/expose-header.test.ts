@@ -4,18 +4,18 @@ import { cors } from '../src'
 import { describe, expect, it } from 'bun:test'
 import { req } from './utils'
 
-describe('Exposed Headers', () => {
+describe('Expose Headers', () => {
     it('Expose single header', async () => {
         const app = new Elysia()
             .use(
                 cors({
-                    exposedHeaders: 'Content-Type'
+                    exposeHeaders: 'Content-Type'
                 })
             )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
-        expect(res.headers.get('Access-Control-Exposed-Headers')).toBe(
+        expect(res.headers.get('Access-Control-Expose-Headers')).toBe(
             'Content-Type'
         )
     })
@@ -24,13 +24,13 @@ describe('Exposed Headers', () => {
         const app = new Elysia()
             .use(
                 cors({
-                    exposedHeaders: ['Content-Type', 'X-Imaginary-Value']
+                    exposeHeaders: ['Content-Type', 'X-Imaginary-Value']
                 })
             )
             .get('/', () => 'HI')
 
         const res = await app.handle(req('/'))
-        expect(res.headers.get('Access-Control-Exposed-Headers')).toBe(
+        expect(res.headers.get('Access-Control-Expose-Headers')).toBe(
             'Content-Type, X-Imaginary-Value'
         )
     })
