@@ -1,3 +1,7 @@
+# 1.0.4 - 9 Jul 2024
+Bug fix:
+- Mirror allow method on preflight options
+
 # 1.0.3 - 18 Mar 2024
 Feature:
 - add `true` to allowHeaders, and exposeHeaders
