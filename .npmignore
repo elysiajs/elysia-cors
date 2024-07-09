@@ -1,9 +1,11 @@
 .git
 .gitignore
+.github
 .prettierrc
 .cjs.swcrc
 .es.swcrc
 bun.lockb
+src
 
 node_modules
 tsconfig.json
