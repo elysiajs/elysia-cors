@@ -11,16 +11,19 @@
     "type": "git",
     "url": "https://github.com/elysiajs/elysia-cors"
   },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-  	"package.json": "./package.json"
+  	"package.json": "./package.json",
   	".": {
 	    "bun": "./dist/index.js",
 	    "node": "./dist/cjs/index.js",
 	    "require": "./dist/cjs/index.js",
 	    "import": "./dist/index.js",
 	    "default": "./dist/cjs/index.js",
-	    "types": "./dist/index.d.ts",
-   	},
+	    "types": "./dist/index.d.ts"
+   	}
   },
   "homepage": "https://github.com/elysiajs/elysia-cors",
   "keywords": [
