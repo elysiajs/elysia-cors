@@ -1,3 +1,7 @@
+# 1.0.5 - 14 Jul 2024
+Bug fix:
+- fix content-type on preflight
+
 # 1.0.4 - 9 Jul 2024
 Bug fix:
 - Mirror allow method on preflight options

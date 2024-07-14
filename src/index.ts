@@ -308,17 +308,18 @@ export const cors = (config?: CORSConfig) => {
 
 	app.headers(defaultHeaders)
 
-	function handleOption({ set, request }: Context) {
+	function handleOption({ set, request, headers }: Context) {
 		handleOrigin(set as any, request)
 		handleMethod(set, request.headers.get('access-control-request-method'))
 
 		if (allowedHeaders === true || exposeHeaders === true) {
-			const headers = processHeaders(request.headers)
-
 			if (allowedHeaders === true)
-				set.headers['access-control-allow-headers'] = headers
+				set.headers['access-control-allow-headers'] =
+					headers['access-control-request-headers']
+
 			if (exposeHeaders === true)
-				set.headers['access-control-expose-headers'] = headers
+				set.headers['access-control-expose-headers'] =
+					Object.keys(headers).join(',')
 		}
 
 		if (maxAge) set.headers['access-control-max-age'] = maxAge.toString()
