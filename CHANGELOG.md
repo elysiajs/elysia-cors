@@ -1,3 +1,8 @@
+
+# 1.1.0 - 16 Jul 2024
+Change:
+- Add support for Elysia 1.1
+
 # 1.0.5 - 14 Jul 2024
 Bug fix:
 - fix content-type on preflight

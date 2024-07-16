@@ -160,6 +160,7 @@ interface CORSConfig {
 	preflight?: boolean
 }
 
+// @ts-ignore
 const isBun = typeof new Headers()?.toJSON === 'function'
 
 /**
@@ -301,6 +302,7 @@ export const cors = (config?: CORSConfig) => {
 		defaultHeaders['access-control-expose-headers'] = exposeHeaders
 
 	if (typeof allowedHeaders === 'string')
+		// @ts-ignore
 		defaultHeaders['access-control-allow-headers'] = allowedHeaders
 
 	if (credentials === true)
@@ -336,6 +338,7 @@ export const cors = (config?: CORSConfig) => {
 		handleMethod(set, request.method)
 
 		if (allowedHeaders === true || exposeHeaders === true) {
+			// @ts-ignore
 			const headers = processHeaders(request.headers)
 
 			if (allowedHeaders === true)

@@ -1,11 +1,10 @@
 .git
-.gitignore
 .github
+.gitignore
 .prettierrc
 .cjs.swcrc
 .es.swcrc
 bun.lockb
-src
 
 node_modules
 tsconfig.json
@@ -20,3 +19,7 @@ CHANGELOG.md
 .eslintrc.js
 tsconfig.cjs.json
 tsconfig.esm.json
+tsconfig.dts.json
+
+build.ts
+src
