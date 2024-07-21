@@ -296,21 +296,20 @@ export const cors = (config?: CORSConfig) => {
 		set.headers['access-control-allow-methods'] = methods.join(', ')
 	}
 
-	const defaultHeaders: Record<string, string> = {}
+  	const handleDefaults = (set: Context['set']) => {
+    		if (typeof exposeHeaders === 'string')
+      			set.headers['access-control-expose-headers'] = exposeHeaders;
 
-	if (typeof exposeHeaders === 'string')
-		defaultHeaders['access-control-expose-headers'] = exposeHeaders
+    		if (typeof allowedHeaders === 'string')
+      			// @ts-ignore
+      			set.headers['access-control-allow-headers'] = allowedHeaders;
 
-	if (typeof allowedHeaders === 'string')
-		// @ts-ignore
-		defaultHeaders['access-control-allow-headers'] = allowedHeaders
-
-	if (credentials === true)
-		defaultHeaders['access-control-allow-credentials'] = 'true'
-
-	app.headers(defaultHeaders)
+    		if (credentials === true)
+      			set.headers['Access-Control-Allow-Credentials'] = 'true';
+  	}
 
 	function handleOption({ set, request, headers }: Context) {
+		handleDefaults(set)
 		handleOrigin(set as any, request)
 		handleMethod(set, request.headers.get('access-control-request-method'))
 
@@ -334,6 +333,7 @@ export const cors = (config?: CORSConfig) => {
 	if (preflight) app.options('/', handleOption).options('/*', handleOption)
 
 	return app.onRequest(function processCors({ set, request }) {
+		handleDefaults(set)
 		handleOrigin(set, request)
 		handleMethod(set, request.method)
 
