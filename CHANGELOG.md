@@ -1,3 +1,6 @@
+# 1.1.1 - 5 Sep 2024
+Feature:
+- add provenance publish
 
 # 1.1.0 - 16 Jul 2024
 Change:

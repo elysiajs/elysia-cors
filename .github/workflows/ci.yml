@@ -1,4 +1,4 @@
-name: Code CI
+name: Build and Test
 
 on:
     push:
@@ -20,7 +20,7 @@ jobs:
 
             - name: Install packages
               run: bun install
-              
+
             - name: Build code
               run: bun run build
 
