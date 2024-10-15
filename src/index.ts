@@ -161,7 +161,7 @@ interface CORSConfig {
 }
 
 // @ts-ignore
-const isBun = typeof new Headers()?.toJSON === 'function'
+const isBun = typeof Bun !== 'undefined'
 
 /**
  * This function is use when headers config is true.
