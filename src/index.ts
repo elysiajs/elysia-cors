@@ -331,7 +331,7 @@ export const cors = (config?: CORSConfig) => {
 		})
 	}
 
-	if (preflight) app.options('/', handleOption).options('/*', handleOption)
+	if (preflight) app.options('/*', handleOption)
 
 	return app.onRequest(function processCors({ set, request }) {
 		handleOrigin(set, request)
