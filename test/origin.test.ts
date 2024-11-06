@@ -86,6 +86,47 @@ describe('Origin', () => {
         )
     })
 
+    it('Accept Function returning string[]', async () => {
+        const app = new Elysia()
+            .use(
+                cors({
+                    origin: () => (['gehenna.sh', 'saltyaom.com'])
+                })
+            )
+            .get('/', () => 'HI')
+
+        const res = await app.fetch(
+            new Request('http://localhost/', {
+                headers: {
+                    origin: 'https://gehenna.sh'
+                }
+            })
+        )
+
+        expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
+            'https://gehenna.sh'
+        )
+    })
+
+    it('Accept Async Function', async () => {
+        const app = new Elysia()
+            .use(
+                cors({
+                    origin: () => new Promise((resolve) => { resolve(true) })
+                })
+            )
+            .get('/', () => 'HI')
+
+        const res = await app.handle(
+            req('/', {
+                Origin: 'https://example.com'
+            })
+        )
+        expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
+            'https://example.com'
+        )
+    })
+
     it('Accept string[]', async () => {
         const app = new Elysia()
             .use(

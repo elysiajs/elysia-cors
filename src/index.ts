@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 import { Elysia, type Context } from 'elysia'
 
-type Origin = string | RegExp | ((request: Request) => boolean | void)
+type Origin = string | RegExp | ((request: Request) => Promise<boolean> | string[] | boolean | void)
 
 export type HTTPMethod =
 	| 'ACL'
@@ -181,11 +181,11 @@ const processHeaders = (headers: Headers) => {
 	return keys
 }
 
-const processOrigin = (
+const processOrigin = async (
 	origin: Origin,
 	request: Request,
 	from: string
-): boolean => {
+): Promise<boolean> => {
 	if (Array.isArray(origin))
 		return origin.some((o) => processOrigin(o, request, from))
 
@@ -195,8 +195,13 @@ const processOrigin = (
 
 			return origin === from
 
-		case 'function':
-			return origin(request) === true
+		case 'function': {
+			const originResponse = origin(request)
+			if (Array.isArray(originResponse))
+				return originResponse.some((o) => processOrigin(o, request, from))
+			else if (originResponse instanceof Promise) return Boolean(await originResponse)
+			return Boolean(originResponse)
+		}
 
 		case 'object':
 			if (origin instanceof RegExp) return origin.test(from)
@@ -237,7 +242,7 @@ export const cors = (config?: CORSConfig) => {
 
 	const anyOrigin = origins?.some((o) => o === '*')
 
-	const handleOrigin = (set: Context['set'], request: Request) => {
+	const handleOrigin = async (set: Context['set'], request: Request) => {
 		// origin === `true` means any origin
 		if (origin === true) {
 			set.headers.vary = '*'
@@ -261,7 +266,7 @@ export const cors = (config?: CORSConfig) => {
 		if (origins.length) {
 			const from = request.headers.get('Origin') ?? ''
 			for (let i = 0; i < origins.length; i++) {
-				const value = processOrigin(origins[i]!, request, from)
+				const value = await processOrigin(origins[i]!, request, from)
 				if (value === true) {
 					set.headers.vary = origin ? 'Origin' : '*'
 					set.headers['access-control-allow-origin'] = from || '*'
@@ -310,8 +315,8 @@ export const cors = (config?: CORSConfig) => {
 
 	app.headers(defaultHeaders)
 
-	function handleOption({ set, request, headers }: Context) {
-		handleOrigin(set as any, request)
+	async function handleOption({ set, request, headers }: Context) {
+		await handleOrigin(set as any, request)
 		handleMethod(set, request.headers.get('access-control-request-method'))
 
 		if (allowedHeaders === true || exposeHeaders === true) {
@@ -333,8 +338,8 @@ export const cors = (config?: CORSConfig) => {
 
 	if (preflight) app.options('/', handleOption).options('/*', handleOption)
 
-	return app.onRequest(function processCors({ set, request }) {
-		handleOrigin(set, request)
+	return app.onRequest(async function processCors({ set, request }) {
+		await handleOrigin(set, request)
 		handleMethod(set, request.method)
 
 		if (allowedHeaders === true || exposeHeaders === true) {
