@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 import { Elysia, type Context } from 'elysia'
 
-type Origin = string | RegExp | ((request: Request) => boolean | void)
+type Origin = string | RegExp | ((request: Request, set: Context['set']) => string | string[] | boolean | void)
 
 export type HTTPMethod =
 	| 'ACL'
@@ -183,11 +183,12 @@ const processHeaders = (headers: Headers) => {
 
 const processOrigin = (
 	origin: Origin,
+	set: Context['set'],
 	request: Request,
 	from: string
 ): boolean => {
 	if (Array.isArray(origin))
-		return origin.some((o) => processOrigin(o, request, from))
+		return origin.some((o) => processOrigin(o, set, request, from))
 
 	switch (typeof origin) {
 		case 'string':
@@ -195,8 +196,14 @@ const processOrigin = (
 
 			return origin === from
 
-		case 'function':
-			return origin(request) === true
+		case 'function': {
+			const originResponse = origin(request, set)
+			if (Array.isArray(originResponse))
+				return originResponse.some((o) => processOrigin(o, set, request, from))
+			else if (typeof originResponse === 'string')
+				return processOrigin(originResponse, set, request, from)
+			return Boolean(originResponse)
+		}
 
 		case 'object':
 			if (origin instanceof RegExp) return origin.test(from)
@@ -261,7 +268,7 @@ export const cors = (config?: CORSConfig) => {
 		if (origins.length) {
 			const from = request.headers.get('Origin') ?? ''
 			for (let i = 0; i < origins.length; i++) {
-				const value = processOrigin(origins[i]!, request, from)
+				const value = processOrigin(origins[i]!, set, request, from)
 				if (value === true) {
 					set.headers.vary = origin ? 'Origin' : '*'
 					set.headers['access-control-allow-origin'] = from || '*'
