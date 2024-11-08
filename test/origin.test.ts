@@ -108,22 +108,25 @@ describe('Origin', () => {
         )
     })
 
-    it('Accept Async Function', async () => {
+    it('Accept Function returning string', async () => {
         const app = new Elysia()
             .use(
                 cors({
-                    origin: () => new Promise((resolve) => { resolve(true) })
+                    origin: () => 'gehenna.sh'
                 })
             )
             .get('/', () => 'HI')
 
-        const res = await app.handle(
-            req('/', {
-                Origin: 'https://example.com'
+        const res = await app.fetch(
+            new Request('http://localhost/', {
+                headers: {
+                    origin: 'https://gehenna.sh'
+                }
             })
         )
+
         expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
-            'https://example.com'
+            'https://gehenna.sh'
         )
     })
 
