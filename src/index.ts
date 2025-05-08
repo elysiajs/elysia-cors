@@ -191,7 +191,8 @@ const processOrigin = (
 
 	switch (typeof origin) {
 		case 'string':
-			if (origin.indexOf('://') === -1) return from.includes(origin)
+			const fromProtocol = from.indexOf('://')
+			if (fromProtocol !== -1) from = from.slice(fromProtocol + 3)
 
 			return origin === from
 
