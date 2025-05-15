@@ -168,7 +168,7 @@ const isBun = typeof new Headers()?.toJSON === 'function'
  * Attempts to process headers based on request headers.
  */
 const processHeaders = (headers: Headers) => {
-	// if (isBun) return Object.keys(headers.toJSON()).join(', ')
+	if (isBun) return Object.keys(headers.toJSON()).join(', ')
 
 	let keys = ''
 

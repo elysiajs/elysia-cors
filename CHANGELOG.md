@@ -1,3 +1,7 @@
+# 1.3.3 - 15 May 2025
+Bug fix:
+- Using Bun shortcut to mirror headers
+
 # 1.3.2 - 15 May 2025
 Bug fix:
 - [#65](https://github.com/elysiajs/elysia-cors/issues/65) strictly check origin protocol
