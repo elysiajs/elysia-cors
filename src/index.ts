@@ -345,6 +345,7 @@ export const cors = (config?: CORSConfig) => {
 		handleMethod(set, request.method)
 
 		if (allowedHeaders === true || exposeHeaders === true) {
+			// @ts-ignore
 			const headers = processHeaders(request.headers)
 
 			if (allowedHeaders === true)
