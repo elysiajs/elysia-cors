@@ -168,42 +168,19 @@ const isBun = typeof new Headers()?.toJSON === 'function'
  * Attempts to process headers based on request headers.
  */
 const processHeaders = (headers: Headers) => {
-	if (isBun) return Object.keys(headers.toJSON()).join(', ')
+	// if (isBun) return Object.keys(headers.toJSON()).join(', ')
 
 	let keys = ''
 
+	let i = 0
 	headers.forEach((_, key) => {
-		keys += key + ', '
+		if (i) keys = keys + ', ' + key
+		else keys = key
+
+		i++
 	})
 
-	if (keys) keys = keys.slice(0, -1)
-
 	return keys
-}
-
-const processOrigin = (
-	origin: Origin,
-	request: Request,
-	from: string
-): boolean => {
-	if (Array.isArray(origin))
-		return origin.some((o) => processOrigin(o, request, from))
-
-	switch (typeof origin) {
-		case 'string':
-			const fromProtocol = from.indexOf('://')
-			if (fromProtocol !== -1) from = from.slice(fromProtocol + 3)
-
-			return origin === from
-
-		case 'function':
-			return origin(request) === true
-
-		case 'object':
-			if (origin instanceof RegExp) return origin.test(from)
-	}
-
-	return false
 }
 
 export const cors = (config?: CORSConfig) => {
@@ -238,6 +215,38 @@ export const cors = (config?: CORSConfig) => {
 
 	const anyOrigin = origins?.some((o) => o === '*')
 
+	const originMap = <Record<string, true>>{}
+	if (origins)
+		for (const origin of origins)
+			if (typeof origin === 'string') originMap[origin] = true
+
+	const processOrigin = (
+		origin: Origin,
+		request: Request,
+		from: string
+	): boolean => {
+		if (Array.isArray(origin))
+			return origin.some((o) => processOrigin(o, request, from))
+
+		switch (typeof origin) {
+			case 'string':
+				if (from in originMap) return true
+
+				const fromProtocol = from.indexOf('://')
+				if (fromProtocol !== -1) from = from.slice(fromProtocol + 3)
+
+				return origin === from
+
+			case 'function':
+				return origin(request) === true
+
+			case 'object':
+				if (origin instanceof RegExp) return origin.test(from)
+		}
+
+		return false
+	}
+
 	const handleOrigin = (set: Context['set'], request: Request) => {
 		// origin === `true` means any origin
 		if (origin === true) {
@@ -269,9 +278,6 @@ export const cors = (config?: CORSConfig) => {
 
 					return
 				}
-
-				// value can be string (truthy value) but not `true`
-				if (value) headers.push(value)
 			}
 		}
 
@@ -339,7 +345,6 @@ export const cors = (config?: CORSConfig) => {
 		handleMethod(set, request.method)
 
 		if (allowedHeaders === true || exposeHeaders === true) {
-			// @ts-ignore
 			const headers = processHeaders(request.headers)
 
 			if (allowedHeaders === true)

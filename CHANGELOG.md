@@ -1,3 +1,7 @@
+# 1.3.2 - 15 May 2025
+Bug fix:
+- [#65](https://github.com/elysiajs/elysia-cors/issues/65) strictly check origin protocol
+
 # 1.3.1 - 8 May 2025
 Bug fix:
 - strictly check origin not using sub includes

@@ -4,7 +4,7 @@ import { cors } from '../src/index'
 const app = new Elysia()
 	.use(
 		cors({
-			origin: 'example.com'
+			origin: 'http://example.com'
 		})
 	)
 	.post('/', ({ body }) => body)
@@ -12,7 +12,9 @@ const app = new Elysia()
 app.handle(
 	new Request('http://localhost/awd', {
 		headers: {
-			origin: 'http://notexample.com'
+			origin: 'https://example.com',
+			a: 'b',
+			c: 'd'
 		}
 	})
 )

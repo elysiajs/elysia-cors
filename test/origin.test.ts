@@ -144,4 +144,34 @@ describe('Origin', () => {
 
 		expect(response.headers.has('access-control-allow-origin')).toBeFalse()
 	})
+
+	it('strictly check protocol', async () => {
+		const app = new Elysia()
+			.use(
+				cors({
+					origin: 'http://example.com'
+				})
+			)
+			.post('/', ({ body }) => body)
+
+		const pass = await app.handle(
+			new Request('http://localhost/awd', {
+				headers: {
+					origin: 'http://example.com'
+				}
+			})
+		)
+
+		expect(pass.headers.has('access-control-allow-origin')).toBeTrue()
+
+		const fail = await app.handle(
+			new Request('http://localhost/awd', {
+				headers: {
+					origin: 'https://example.com'
+				}
+			})
+		)
+
+		expect(fail.headers.has('access-control-allow-origin')).toBeFalse()
+	})
 })
