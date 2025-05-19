@@ -113,8 +113,10 @@ interface CORSConfig {
 	 *
 	 * - `string[]` - Allow multiple HTTP methods.
 	 *     - eg: ['Content-Type', 'Authorization']
+	 *
+	 * - `false` - Do not send `Access-Control-Allow-Headers` header.
 	 */
-	allowedHeaders?: true | string | string[]
+	allowedHeaders?: boolean | string | string[]
 	/**
 	 * @default `*`
 	 *
@@ -128,8 +130,10 @@ interface CORSConfig {
 	 *
 	 * - `string[]` - Allow multiple HTTP methods.
 	 *     - eg: ['Content-Type', 'X-Powered-By']
+	 *
+	 * - `false` - Do not send `Access-Control-Expose-Headers` header.
 	 */
-	exposeHeaders?: true | string | string[]
+	exposeHeaders?: boolean | string | string[]
 	/**
 	 * @default `true`
 	 *
