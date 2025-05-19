@@ -131,8 +131,8 @@ interface CORSConfig {
 	 * - `string[]` - Allow multiple HTTP methods.
 	 *     - eg: ['Content-Type', 'X-Powered-By']
          *
-	 * - `false` - Do not send `Access-Control-Expose-Headers` header.
-	 */
+         * - `false` - Do not send `Access-Control-Expose-Headers` header.
+         */
 	exposeHeaders?: boolean | string | string[]
 	/**
 	 * @default `true`
@@ -141,8 +141,8 @@ interface CORSConfig {
 	 *
 	 * Allow incoming requests to send `credentials` header.
 	 *
-	 * - `boolean` - Available if set to `true`.
-	 */
+         * - `boolean` - Available if set to `true`.
+         */
 	credentials?: boolean
 	/**
 	 * @default `5`
