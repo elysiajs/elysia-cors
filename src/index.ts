@@ -141,8 +141,8 @@ interface CORSConfig {
 	 *
 	 * Allow incoming requests to send `credentials` header.
 	 *
-         * - `boolean` - Available if set to `true`.
-         */
+   * - `boolean` - Available if set to `true`.
+   */
 	credentials?: boolean
 	/**
 	 * @default `5`
