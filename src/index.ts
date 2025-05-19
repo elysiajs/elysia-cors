@@ -130,7 +130,7 @@ interface CORSConfig {
 	 *
 	 * - `string[]` - Allow multiple HTTP methods.
 	 *     - eg: ['Content-Type', 'X-Powered-By']
-   *
+	 *
    * - `false` - Do not send `Access-Control-Expose-Headers` header.
    */
 	exposeHeaders?: boolean | string | string[]
