@@ -38,7 +38,7 @@ Value can be one of the following:
     })
 
     // Type Definition
-    type CORSOriginFn = (context: Context) => boolean | void
+    type CORSOriginFn = (context: Context) => boolean | void | Promise<boolean | void>
     ```
 
 - `Array<string | RegExp | Function>` - Will try to find truthy value of all options above. Will accept Request if one is `true`.
