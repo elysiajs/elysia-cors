@@ -1,7 +1,10 @@
 /* eslint-disable no-case-declarations */
 import { Elysia, type Context } from 'elysia'
 
-type Origin = string | RegExp | ((request: Request) => boolean | void)
+export type Origin =
+	| string
+	| RegExp
+	| ((request: Request) => boolean | void | Promise<boolean | void>)
 
 export type HTTPMethod =
 	| 'ACL'
@@ -70,7 +73,7 @@ interface CORSConfig {
 	 *   })
 	 *
 	 *   // Type Definition
-	 *   type CORSOriginFn = (context: Context) => boolean | void
+	 *   type CORSOriginFn = (context: Context) => boolean | void | Promise<boolean | void>
 	 *   ```
 	 *
 	 * - `Array<string | RegExp | Function>` - Will try to find truthy value of all options above. Will accept request if one is `true`.
