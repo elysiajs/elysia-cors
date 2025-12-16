@@ -346,24 +346,11 @@ export const cors = (config?: CORSConfig) => {
 		// Handle OPTIONS preflight in onRequest to ensure it runs
 		// before any .all() handlers can intercept it
 		if (preflight && request.method === 'OPTIONS') {
-			handleMethod(
+			return handleOption({
 				set,
-				request.headers.get('access-control-request-method')
-			)
-
-			if (allowedHeaders === true)
-				set.headers['access-control-allow-headers'] =
-					request.headers.get('access-control-request-headers') ?? ''
-
-			if (exposeHeaders === true)
-				set.headers['access-control-expose-headers'] = processHeaders(
-					request.headers
-				)
-
-			if (maxAge)
-				set.headers['access-control-max-age'] = maxAge.toString()
-
-			return new Response(null, { status: 204 })
+				request,
+				headers: request.headers.toJSON() as Record<string, string>
+			} as Context)
 		}
 
 		// Non-preflight requests
