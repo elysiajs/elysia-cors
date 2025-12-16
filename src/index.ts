@@ -204,8 +204,8 @@ export const cors = (config?: CORSConfig) => {
 		typeof origin === 'boolean'
 			? undefined
 			: Array.isArray(origin)
-				? origin
-				: [origin]
+			? origin
+			: [origin]
 
 	const app = new Elysia({
 		name: '@elysiajs/cors',
@@ -342,17 +342,41 @@ export const cors = (config?: CORSConfig) => {
 
 	return app.onRequest(function processCors({ set, request }) {
 		handleOrigin(set, request)
+
+		// Handle OPTIONS preflight in onRequest to ensure it runs
+		// before any .all() handlers can intercept it
+		if (preflight && request.method === 'OPTIONS') {
+			handleMethod(
+				set,
+				request.headers.get('access-control-request-method')
+			)
+
+			if (allowedHeaders === true)
+				set.headers['access-control-allow-headers'] =
+					request.headers.get('access-control-request-headers') ?? ''
+
+			if (exposeHeaders === true)
+				set.headers['access-control-expose-headers'] = processHeaders(
+					request.headers
+				)
+
+			if (maxAge)
+				set.headers['access-control-max-age'] = maxAge.toString()
+
+			return new Response(null, { status: 204 })
+		}
+
+		// Non-preflight requests
 		handleMethod(set, request.method)
 
 		if (allowedHeaders === true || exposeHeaders === true) {
-			// @ts-ignore
-			const headers = processHeaders(request.headers)
+			const processedHeaders = processHeaders(request.headers)
 
 			if (allowedHeaders === true)
-				set.headers['access-control-allow-headers'] = headers
+				set.headers['access-control-allow-headers'] = processedHeaders
 
 			if (exposeHeaders === true)
-				set.headers['access-control-expose-headers'] = headers
+				set.headers['access-control-expose-headers'] = processedHeaders
 		}
 	})
 }
