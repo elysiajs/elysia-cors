@@ -370,13 +370,14 @@ export const cors = (config?: CORSConfig) => {
 		handleMethod(set, request.method)
 
 		if (allowedHeaders === true || exposeHeaders === true) {
-			const processedHeaders = processHeaders(request.headers)
+			// @ts-ignore
+			const headers = processHeaders(request.headers)
 
 			if (allowedHeaders === true)
-				set.headers['access-control-allow-headers'] = processedHeaders
+				set.headers['access-control-allow-headers'] = headers
 
 			if (exposeHeaders === true)
-				set.headers['access-control-expose-headers'] = processedHeaders
+				set.headers['access-control-expose-headers'] = headers
 		}
 	})
 }
