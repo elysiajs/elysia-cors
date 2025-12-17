@@ -349,7 +349,10 @@ export const cors = (config?: CORSConfig) => {
 			return handleOption({
 				set,
 				request,
-				headers: request.headers.toJSON() as Record<string, string>
+				headers: isBun
+					? request.headers.toJSON()
+					: // for non-Bun environments
+					  Object.fromEntries((request.headers as any).entries())
 			} as Context)
 		}
 
