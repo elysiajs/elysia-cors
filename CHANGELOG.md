@@ -1,3 +1,10 @@
+# 1.4.1 - 28 Dec 2025
+Improvement:
+- [#75](https://github.com/elysiajs/elysia-cors/issues/75) export `CORSConfig` type
+
+Bug fix:
+- [#74](https://github.com/elysiajs/elysia-cors/pull/74) `ALL` method not working
+
 # 1.3.3 - 15 May 2025
 Bug fix:
 - Using Bun shortcut to mirror headers

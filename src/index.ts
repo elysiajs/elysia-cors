@@ -41,7 +41,7 @@ export type HTTPMethod =
 
 type MaybeArray<T> = T | T[]
 
-interface CORSConfig {
+export interface CORSConfig {
 	/**
 	 * Disable AOT (Ahead of Time) compilation for plugin instance
 	 *
@@ -204,8 +204,8 @@ export const cors = (config?: CORSConfig) => {
 		typeof origin === 'boolean'
 			? undefined
 			: Array.isArray(origin)
-			? origin
-			: [origin]
+				? origin
+				: [origin]
 
 	const app = new Elysia({
 		name: '@elysiajs/cors',
@@ -266,8 +266,6 @@ export const cors = (config?: CORSConfig) => {
 
 		if (!origins?.length) return
 
-		const headers: string[] = []
-
 		if (origins.length) {
 			const from = request.headers.get('Origin') ?? ''
 			for (let i = 0; i < origins.length; i++) {
@@ -282,8 +280,6 @@ export const cors = (config?: CORSConfig) => {
 		}
 
 		set.headers.vary = 'Origin'
-		if (headers.length)
-			set.headers['access-control-allow-origin'] = headers.join(', ')
 	}
 
 	const handleMethod = (set: Context['set'], method?: string | null) => {
@@ -352,7 +348,7 @@ export const cors = (config?: CORSConfig) => {
 				headers: isBun
 					? request.headers.toJSON()
 					: // for non-Bun environments
-					  Object.fromEntries((request.headers as any).entries())
+						Object.fromEntries((request.headers as any).entries())
 			} as Context)
 		}
 
