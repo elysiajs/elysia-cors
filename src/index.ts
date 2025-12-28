@@ -204,8 +204,8 @@ export const cors = (config?: CORSConfig) => {
 		typeof origin === 'boolean'
 			? undefined
 			: Array.isArray(origin)
-				? origin
-				: [origin]
+			? origin
+			: [origin]
 
 	const app = new Elysia({
 		name: '@elysiajs/cors',
@@ -342,6 +342,21 @@ export const cors = (config?: CORSConfig) => {
 
 	return app.onRequest(function processCors({ set, request }) {
 		handleOrigin(set, request)
+
+		// Handle OPTIONS preflight in onRequest to ensure it runs
+		// before any .all() handlers can intercept it
+		if (preflight && request.method === 'OPTIONS') {
+			return handleOption({
+				set,
+				request,
+				headers: isBun
+					? request.headers.toJSON()
+					: // for non-Bun environments
+					  Object.fromEntries((request.headers as any).entries())
+			} as Context)
+		}
+
+		// Non-preflight requests
 		handleMethod(set, request.method)
 
 		if (allowedHeaders === true || exposeHeaders === true) {
