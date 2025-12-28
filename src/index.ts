@@ -266,24 +266,18 @@ export const cors = (config?: CORSConfig) => {
 
 		if (!origins?.length) return
 
-		const headers: string[] = []
+		const from = request.headers.get('Origin') ?? ''
+		for (let i = 0; i < origins.length; i++) {
+			const value = processOrigin(origins[i]!, request, from)
+			if (value) {
+				set.headers.vary = origin ? 'Origin' : '*'
+				set.headers['access-control-allow-origin'] = from || '*'
 
-		if (origins.length) {
-			const from = request.headers.get('Origin') ?? ''
-			for (let i = 0; i < origins.length; i++) {
-				const value = processOrigin(origins[i]!, request, from)
-				if (value === true) {
-					set.headers.vary = origin ? 'Origin' : '*'
-					set.headers['access-control-allow-origin'] = from || '*'
-
-					return
-				}
+				return
 			}
 		}
 
 		set.headers.vary = 'Origin'
-		if (headers.length)
-			set.headers['access-control-allow-origin'] = headers.join(', ')
 	}
 
 	const handleMethod = (set: Context['set'], method?: string | null) => {
