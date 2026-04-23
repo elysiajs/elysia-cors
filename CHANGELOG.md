@@ -1,3 +1,7 @@
+# 1.4.2 - 24 Apr 2026
+Chore:
+- publish under @elysia scope
+
 # 1.4.1 - 28 Dec 2025
 Improvement:
 - [#75](https://github.com/elysiajs/elysia-cors/issues/75) export `CORSConfig` type
