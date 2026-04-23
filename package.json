@@ -1,7 +1,7 @@
 {
-    "name": "@elysiajs/cors",
-    "version": "1.4.1",
-    "description": "Plugin for Elysia that for Cross Origin Requests (CORs)",
+    "name": "@elysia/cors",
+    "version": "1.4.2",
+    "description": "Elysia plugin to support Cross Origin Requests (CORs)",
     "author": {
         "name": "saltyAom",
         "url": "https://github.com/SaltyAom",

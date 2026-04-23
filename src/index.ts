@@ -346,8 +346,8 @@ export const cors = (config?: CORSConfig) => {
 				set,
 				request,
 				headers: isBun
-				// @ts-ignore
-					? request.headers.toJSON()
+					? // @ts-ignore
+						request.headers.toJSON()
 					: // for non-Bun environments
 						Object.fromEntries((request.headers as any).entries())
 			} as Context)

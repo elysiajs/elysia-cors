@@ -1,15 +1,15 @@
-# @elysiajs/cors
-Plugin for [elysia](https://github.com/elysiajs/elysia) that for Cross Origin Requests (CORs)
+# @elysia/cors
+[Elysia](https://github.com/elysiajs/elysia) to support Cross Origin Requests (CORs)
 
 ## Installation
 ```bash
-bun add @elysiajs/cors
+bun add @elysia/cors
 ```
 
 ## Example
 ```typescript
 import { Elysia } from 'elysia'
-import { cors } from '@elysiajs/cors'
+import { cors } from '@elysia/cors'
 
 const app = new Elysia()
     .use(cors())
