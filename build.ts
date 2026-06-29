@@ -16,7 +16,7 @@ await Promise.all([
     build({
         outDir: 'dist',
         format: 'esm',
-        target: 'node20',
+        target: 'node22',
         cjsInterop: false,
         ...tsupConfig
     }),
@@ -24,7 +24,7 @@ await Promise.all([
     build({
         outDir: 'dist/cjs',
         format: 'cjs',
-        target: 'node20',
+        target: 'node22',
         // dts: true,
         ...tsupConfig
     })

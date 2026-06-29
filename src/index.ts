@@ -1,5 +1,6 @@
 /* eslint-disable no-case-declarations */
-import { Elysia, type Context } from 'elysia'
+import { Elysia } from 'elysia/base'
+import type { Context } from 'elysia/context'
 
 type Origin = string | RegExp | ((request: Request) => boolean | void)
 
@@ -43,12 +44,6 @@ type MaybeArray<T> = T | T[]
 
 export interface CORSConfig {
 	/**
-	 * Disable AOT (Ahead of Time) compilation for plugin instance
-	 *
-	 * @default true
-	 */
-	aot?: boolean
-	/**
 	 * @default `true`
 	 *
 	 * Assign the **Access-Control-Allow-Origin** header.
@@ -76,6 +71,7 @@ export interface CORSConfig {
 	 * - `Array<string | RegExp | Function>` - Will try to find truthy value of all options above. Will accept request if one is `true`.
 	 */
 	origin?: Origin | boolean | Origin[]
+
 	/**
 	 * @default `*`
 	 *
@@ -100,6 +96,7 @@ export interface CORSConfig {
 		| ''
 		| '*'
 		| MaybeArray<HTTPMethod | (string & {})>
+
 	/**
 	 * @default `*`
 	 *
@@ -115,6 +112,7 @@ export interface CORSConfig {
 	 *     - eg: ['Content-Type', 'Authorization']
 	 */
 	allowedHeaders?: true | string | string[]
+
 	/**
 	 * @default `*`
 	 *
@@ -130,6 +128,7 @@ export interface CORSConfig {
 	 *     - eg: ['Content-Type', 'X-Powered-By']
 	 */
 	exposeHeaders?: true | string | string[]
+
 	/**
 	 * @default `true`
 	 *
@@ -140,6 +139,7 @@ export interface CORSConfig {
 	 * - `boolean` - Available if set to `true`.
 	 */
 	credentials?: boolean
+
 	/**
 	 * @default `5`
 	 *
@@ -150,6 +150,7 @@ export interface CORSConfig {
 	 * - `number` - Duration in seconds to indicates how long the results of a preflight request can be cached.
 	 */
 	maxAge?: number
+
 	/**
 	 * @default `true`
 	 *
@@ -167,7 +168,7 @@ const isBun = typeof new Headers()?.toJSON === 'function'
  * This function is use when headers config is true.
  * Attempts to process headers based on request headers.
  */
-const processHeaders = (headers: Headers) => {
+function processHeaders(headers: Headers) {
 	if (isBun) return Object.keys(headers.toJSON()).join(', ')
 
 	let keys = ''
@@ -185,7 +186,6 @@ const processHeaders = (headers: Headers) => {
 
 export const cors = (config?: CORSConfig) => {
 	let {
-		aot = true,
 		origin = true,
 		methods = true,
 		allowedHeaders = true,
@@ -209,8 +209,7 @@ export const cors = (config?: CORSConfig) => {
 
 	const app = new Elysia({
 		name: '@elysiajs/cors',
-		seed: config,
-		aot
+		seed: config
 	})
 
 	const anyOrigin = origins?.some((o) => o === '*')
@@ -299,7 +298,7 @@ export const cors = (config?: CORSConfig) => {
 		set.headers['access-control-allow-methods'] = methods.join(', ')
 	}
 
-	const defaultHeaders: Record<string, string> = {}
+	const defaultHeaders: Record<string, string> = Object.create(null)
 
 	if (typeof exposeHeaders === 'string')
 		defaultHeaders['access-control-expose-headers'] = exposeHeaders
@@ -336,12 +335,12 @@ export const cors = (config?: CORSConfig) => {
 
 	if (preflight) app.options('/', handleOption).options('/*', handleOption)
 
-	return app.onRequest(function processCors({ set, request }) {
+	return app.request(function processCors({ set, request }) {
 		handleOrigin(set, request)
 
 		// Handle OPTIONS preflight in onRequest to ensure it runs
 		// before any .all() handlers can intercept it
-		if (preflight && request.method === 'OPTIONS') {
+		if (preflight && request.method === 'OPTIONS')
 			return handleOption({
 				set,
 				request,
@@ -351,7 +350,6 @@ export const cors = (config?: CORSConfig) => {
 					: // for non-Bun environments
 						Object.fromEntries((request.headers as any).entries())
 			} as Context)
-		}
 
 		// Non-preflight requests
 		handleMethod(set, request.method)
