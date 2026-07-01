@@ -1,6 +1,6 @@
 {
     "name": "@elysia/cors",
-    "version": "2.0.0-exp.0",
+    "version": "2.0.0-exp.1",
     "description": "Elysia plugin to support Cross Origin Requests (CORs)",
     "author": {
         "name": "saltyAom",
@@ -11,7 +11,7 @@
         "type": "git",
         "url": "https://github.com/elysiajs/elysia-cors"
     },
-    "main": "./dist/cjs/index.js",
+    "main": "./dist/index.js",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
     "exports": {
@@ -19,7 +19,7 @@
         ".": {
             "types": "./dist/index.d.ts",
             "import": "./dist/index.mjs",
-            "require": "./dist/cjs/index.js"
+            "require": "./dist/index.js"
         }
     },
     "homepage": "https://github.com/elysiajs/elysia-cors",
@@ -40,8 +40,7 @@
         "@types/node": "^20.14.10",
         "elysia": "^2.0.0-exp.14",
         "eslint": "9.6.0",
-        "tsup": "^8.1.0",
-        "typebox": "1.2",
+        "tsdown": "^0.22.3",
         "typescript": "^6.0.3"
     },
     "peerDependencies": {
