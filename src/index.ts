@@ -214,10 +214,10 @@ export const cors = (config?: CORSConfig) => {
 
 	const anyOrigin = origins?.some((o) => o === '*')
 
-	const originMap = <Record<string, true>>{}
+	const originSet = new Set<string>()
 	if (origins)
 		for (const origin of origins)
-			if (typeof origin === 'string') originMap[origin] = true
+			if (typeof origin === 'string') originSet.add(origin)
 
 	const processOrigin = (
 		origin: Origin,
@@ -229,7 +229,7 @@ export const cors = (config?: CORSConfig) => {
 
 		switch (typeof origin) {
 			case 'string':
-				if (from in originMap) return true
+				if (originSet.has(from)) return true
 
 				const fromProtocol = from.indexOf('://')
 				if (fromProtocol !== -1) from = from.slice(fromProtocol + 3)
@@ -335,7 +335,7 @@ export const cors = (config?: CORSConfig) => {
 
 	if (preflight) app.options('/', handleOption).options('/*', handleOption)
 
-	return app.request(function processCors({ set, request }) {
+	return app.onRequest(function processCors({ set, request }) {
 		handleOrigin(set, request)
 
 		// Handle OPTIONS preflight in onRequest to ensure it runs

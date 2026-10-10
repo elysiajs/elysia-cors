@@ -174,4 +174,20 @@ describe('Origin', () => {
 
 		expect(fail.headers.has('access-control-allow-origin')).toBeFalse()
 	})
+
+	it('not match Object.prototype keys as origin', async () => {
+		const app = new Elysia()
+			.use(
+				cors({
+					origin: 'https://a.com'
+				})
+			)
+			.get('/', () => 'A')
+
+		for (const origin of ['constructor', 'toString', '__proto__']) {
+			const res = await app.handle(req('/', { origin }))
+
+			expect(res.headers.has('access-control-allow-origin')).toBeFalse()
+		}
+	})
 })
