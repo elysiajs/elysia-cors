@@ -19,8 +19,6 @@ describe("CORS", () => {
         expect(res.headers.get("Access-Control-Expose-Headers")).toBe(
             "origin",
         );
-        expect(res.headers.get("Access-Control-Allow-Credentials")).toBe(
-            "true",
-        );
+        expect(res.headers.get("Access-Control-Allow-Credentials")).toBeNull();
     });
 });

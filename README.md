@@ -25,7 +25,7 @@ Assign the **Access-Control-Allow-Origin** header.
 Value can be one of the following:
 - `string` - String of origin which will directly assign to `Access-Control-Allow-Origin`
 
-- `boolean` - If set to true, `Access-Control-Allow-Origin` will be set to `*` (accept all origin)
+- `boolean` - If set to true, the request origin will be reflected in `Access-Control-Allow-Origin`
 
 - `RegExp` - Pattern to use to test with request's url, will accept origin if matched.
 
@@ -89,13 +89,24 @@ Value can be one of the following:
     - eg: ['Content-Type', 'X-Powered-By']
 
 ### credentials
-@default `true`
+@default `false`
 
 Assign **Access-Control-Allow-Credentials** header. 
 
 Allow incoming requests to send `credentials` header.
 
 - `boolean` - Available if set to `true`.
+
+Credentialed CORS should use an explicit origin allowlist:
+
+```typescript
+cors({
+    origin: 'https://app.example.com',
+    credentials: true
+})
+```
+
+For backward compatibility, `cors({ credentials: true })` reflects and trusts any request origin. Do not use this configuration for private APIs.
 
 ### maxAge
 @default `5`

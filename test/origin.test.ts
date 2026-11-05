@@ -36,8 +36,14 @@ describe('Origin', () => {
 			)
 			.get('/', () => 'HI')
 
-		const res = await app.handle(req('/'))
-		expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*')
+		const res = await app.handle(
+			req('/', {
+				Origin: 'https://example.com'
+			})
+		)
+		expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
+			'https://example.com'
+		)
 	})
 
 	it('Accept RegExp', async () => {
