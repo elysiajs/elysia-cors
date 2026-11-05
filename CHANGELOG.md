@@ -1,3 +1,13 @@
+# 1.4.3 - 5 Nov 2026
+Security:
+- disable credentialed cross-origin requests by default
+
+Breaking Change:
+- default `credentials` to `false`
+
+Migration:
+- applications relying on credentialed CORS must set `credentials: true`; an explicit origin such as `cors({ origin: 'https://app.example.com', credentials: true })` is strongly recommended
+
 # 1.4.2 - 24 Apr 2026
 Chore:
 - publish under @elysia scope

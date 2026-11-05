@@ -56,7 +56,7 @@ export interface CORSConfig {
 	 * Value can be one of the following:
 	 * - `string` - String of origin which will be directly assign to `Access-Control-Allow-Origin`
 	 *
-	 * - `boolean` - If set to true, `Access-Control-Allow-Origin` will be set to `*` (accept all origin)
+	 * - `boolean` - If set to true, the request origin will be reflected in `Access-Control-Allow-Origin`
 	 *
 	 * - `RegExp` - Pattern to use to test with request's url, will accept origin if matched.
 	 *
@@ -131,7 +131,7 @@ export interface CORSConfig {
 	 */
 	exposeHeaders?: true | string | string[]
 	/**
-	 * @default `true`
+	 * @default `false`
 	 *
 	 * Assign **Access-Control-Allow-Credentials** header.
 	 *
@@ -190,7 +190,7 @@ export const cors = (config?: CORSConfig) => {
 		methods = true,
 		allowedHeaders = true,
 		exposeHeaders = true,
-		credentials = true,
+		credentials = false,
 		maxAge = 5,
 		preflight = true
 	} = config ?? {}
@@ -206,14 +206,13 @@ export const cors = (config?: CORSConfig) => {
 			: Array.isArray(origin)
 				? origin
 				: [origin]
-
 	const app = new Elysia({
 		name: '@elysiajs/cors',
 		seed: config,
 		aot
 	})
 
-	const anyOrigin = origins?.some((o) => o === '*')
+	const anyOrigin = origins?.some((origin) => origin === '*')
 
 	const originMap = <Record<string, true>>{}
 	if (origins)
